@@ -147,7 +147,7 @@ ORM: SQLModel
 ```
 フロントエンド: Vercel
 バックエンド API: Vercel Functions
-データベース: Aurora DB (MySQL互換)
+データベース: Aurora DB (PostgreSQL互換)
 認証: Google OAuth 2.0
 ```
 
