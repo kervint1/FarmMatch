@@ -46,10 +46,11 @@ CREATE TABLE users (
     prefecture VARCHAR(10),
     city VARCHAR(50),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_user_type (user_type),
-    INDEX idx_email (email)
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_user_type ON users(user_type);
+CREATE INDEX idx_email ON users(email);
 ```
 
 ---
