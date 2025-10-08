@@ -46,51 +46,55 @@ Farm Matchは、ファームステイ先の検索・予約から体験の記録�
 
 ## 開発環境セットアップ
 
-### 方法1: Dev Container（推奨）
+### Dev Container（推奨）
 
-VS Codeで開発する場合、Dev Containerを使用すると簡単に環境構築できます。
+VS Code Dev Containerを使用すると、統一された開発環境で作業できます。
+
+#### 前提条件
+- Docker Desktop インストール済み
+- VS Code + Dev Containers拡張機能
+
+#### セットアップ手順
 
 1. VS Codeで本プロジェクトを開く
 2. `Ctrl+Shift+P` (Mac: `Cmd+Shift+P`) でコマンドパレットを開く
 3. `Dev Containers: Reopen in Container` を選択
-4. コンテナのビルドと起動を待つ
+4. コンテナのビルドと起動を待つ（初回3-5分）
 
-Dev Containerには以下が含まれます：
-- Node.js 18
-- Python 3.11
-- PostgreSQL 15
-- 必要なVS Code拡張機能
+#### Dev Container環境
+- **Node.js 20** (LTS)
+- **Python 3.11**
+- **PostgreSQL 15** (自動起動)
+- **VS Code拡張機能** (自動インストール)
+  - ESLint, Prettier
+  - Python, Pylance, Ruff
+  - SQLTools
 
-### 方法2: Docker Compose
-
-```bash
-# 環境変数ファイルを作成
-cp .env.example .env
-
-# コンテナを起動
-docker-compose up -d
-
-# フロントエンド: http://localhost:3000
-# バックエンド: http://localhost:8000
-# API ドキュメント: http://localhost:8000/docs
-```
-
-### 方法3: ローカル環境
-
-#### フロントエンド
+#### コンテナ起動後
 
 ```bash
+# フロントエンド起動
 cd frontend
 npm install
 npm run dev
-```
+# → http://localhost:3000
 
-#### バックエンド
-
-```bash
+# バックエンド起動（別ターミナル）
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload
+# → http://localhost:8000
+# → http://localhost:8000/docs (Swagger UI)
+```
+
+#### データベース接続
+
+```
+Host: db (コンテナ間) または localhost (ホストから)
+Port: 5432
+Database: farmatch_db
+User: farmatch
+Password: farmatch_dev
 ```
 
 ## 環境変数設定
@@ -115,27 +119,25 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 FarmMatch/
 ├── .devcontainer/          # Dev Container設定
-│   ├── devcontainer.json
-│   ├── docker-compose.yml
-│   └── Dockerfile
+│   ├── devcontainer.json  # VS Code設定
+│   ├── docker-compose.yml # コンテナ構成
+│   └── Dockerfile         # 開発環境イメージ
 ├── frontend/               # Next.js アプリ
 │   ├── src/
 │   │   ├── app/           # App Router
 │   │   ├── components/    # 共通コンポーネント
 │   │   └── lib/           # ユーティリティ
-│   ├── Dockerfile
 │   └── package.json
 ├── backend/                # FastAPI
 │   ├── app/
 │   │   ├── models/        # SQLModel
 │   │   ├── routers/       # API エンドポイント
 │   │   └── core/          # 認証・設定
-│   ├── Dockerfile
 │   └── requirements.txt
 ├── docs/                   # ドキュメント
 │   ├── DB.md              # データベース設計
+│   ├── infrastructure.md  # インフラ設計
 │   └── requirementsDefinition.md
-├── docker-compose.yml      # 開発環境
 ├── .env.example
 └── README.md
 ```
@@ -143,6 +145,7 @@ FarmMatch/
 ## ドキュメント
 
 - [データベーススキーマ設計](docs/DB.md)
+- [インフラストラクチャ設計](docs/infrastructure.md)
 - [要件定義書](docs/requirementsDefinition.md)
 
 ## 開発期間
