@@ -205,3 +205,29 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Node.js / Next.js
+node_modules/
+.next/
+.swc/
+out/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# Frontend dependencies
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.swc/
+
+# npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Package manager lock files (optional - can be committed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
