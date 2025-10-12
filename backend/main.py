@@ -1,18 +1,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from core.config import settings
+
 app = FastAPI(
-    title="Farm Match API",
+    title=settings.APP_NAME,
     description="API for Farm Match - Connect people with farm stay experiences",
-    version="0.1.0",
+    version=settings.APP_VERSION,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,8 +21,8 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to Farm Match API",
-        "version": "0.1.0",
+        "message": f"Welcome to {settings.APP_NAME}",
+        "version": settings.APP_VERSION,
         "docs": "/docs",
     }
 
