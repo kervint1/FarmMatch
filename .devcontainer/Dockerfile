@@ -37,6 +37,13 @@ RUN if getent group $USER_GID; then \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 \
     && update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 
+# Remove PEP 668 externally managed environment restriction
+RUN rm -f /usr/lib/python3.11/EXTERNALLY-MANAGED
+
+# Install Python dependencies
+COPY backend/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+
 # Install global Node.js tools
 RUN npm install -g npm@latest
 
