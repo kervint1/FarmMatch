@@ -69,7 +69,15 @@ backend/
 
 ## 環境変数
 
-`.env`ファイルに以下の環境変数を設定してください：
+### セットアップ
+
+1. `.env.example`をコピーして`.env`を作成：
+
+```bash
+cp .env.example .env
+```
+
+2. `.env`ファイルを編集して、必要な環境変数を設定：
 
 ```env
 # アプリケーション設定
@@ -77,21 +85,29 @@ APP_NAME=Farm Match API
 APP_VERSION=0.1.0
 DEBUG=True
 
-# データベース
+# データベース（必須）
 DATABASE_URL=postgresql://farmatch:farmatch_dev@db:5432/farmatch_db
 
-# CORS
-CORS_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000"]
+# CORS Origins（カンマ区切り）
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
-# 認証
+# 認証（必須）
 SECRET_KEY=your-secret-key-change-in-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 # Google OAuth (NextAuth.jsで使用)
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
+# GOOGLE_CLIENT_ID=your-google-client-id
+# GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
+
+### 重要な環境変数
+
+- **DATABASE_URL** (必須): PostgreSQLデータベース接続URL
+- **SECRET_KEY** (必須): JWT トークン生成用のシークレットキー
+  - 本番環境では必ず安全な値に変更してください
+  - 生成例: `openssl rand -hex 32`
+- **CORS_ORIGINS**: フロントエンドのオリジン（カンマ区切り）
 
 ## 開発環境のセットアップ
 
@@ -99,7 +115,8 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 
 1. VS Codeで`.devcontainer`フォルダを開く
 2. "Reopen in Container"を選択
-3. コンテナが起動したら、以下のコマンドで確認：
+3. `.env`ファイルを作成（上記参照）
+4. コンテナが起動したら、以下のコマンドで確認：
 
 ```bash
 python main.py
@@ -110,6 +127,10 @@ python main.py
 ```bash
 # 依存関係インストール
 pip install -r requirements.txt
+
+# 環境変数設定
+cp .env.example .env
+# .envファイルを編集
 
 # アプリケーション起動
 python main.py

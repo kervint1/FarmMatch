@@ -1,26 +1,45 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Farm Match API"
-    APP_VERSION: str = "0.1.0"
-    DEBUG: bool = True
+    """Application settings loaded from environment variables or .env file."""
 
-    DATABASE_URL: str = "postgresql://farmatch:farmatch_dev@db:5432/farmatch_db"
+    # Application Settings
+    APP_NAME: str = Field(default="Farm Match API")
+    APP_VERSION: str = Field(default="0.1.0")
+    DEBUG: bool = Field(default=False)
 
-    CORS_ORIGINS: list[str] = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ]
+    # Database
+    DATABASE_URL: str = Field(
+        ...,
+        description="PostgreSQL database URL",
+    )
 
-    SECRET_KEY: str = "your-secret-key-change-in-production"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    # CORS
+    CORS_ORIGINS: str = Field(
+        default="http://localhost:3000,http://127.0.0.1:3000",
+        description="Comma-separated list of allowed CORS origins",
+    )
+
+    # Authentication
+    SECRET_KEY: str = Field(
+        ...,
+        description="Secret key for JWT token generation",
+    )
+    ALGORITHM: str = Field(default="HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
 
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
+        extra="ignore",
     )
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """Parse CORS_ORIGINS string into list."""
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
 
 settings = Settings()
