@@ -1,101 +1,101 @@
-import Image from "next/image";
+import Link from "next/link";
+import Button from "@/components/Button";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-b from-green-50 to-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold text-gray-900 mb-6">
+              農業体験で、新しい旅を。
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Farm Matchは、ファームステイ先の検索・予約から体験の記録・共有まで
+              一元管理できるWebアプリケーションです。
+            </p>
+            
+            <div className="flex gap-4 justify-center mb-12">
+              <Link href="/search">
+                <Button size="lg">ファームを探す</Button>
+              </Link>
+              <Link href="/about">
+                <Button variant="outline" size="lg">詳しく見る</Button>
+              </Link>
+            </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {/* Search Bar */}
+            <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
+              <div className="flex gap-4">
+                <input
+                  type="text"
+                  placeholder="キーワードで検索（例：有機農業、田植え体験）"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <select className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <option value="">都道府県</option>
+                  <option value="hokkaido">北海道</option>
+                  <option value="aomori">青森県</option>
+                  <option value="nagano">長野県</option>
+                  <option value="shizuoka">静岡県</option>
+                </select>
+                <Button size="lg">検索</Button>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12">主要機能</h2>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition">
+              <div className="text-4xl mb-4">🔍</div>
+              <h3 className="text-xl font-semibold mb-3">ファームステイ検索</h3>
+              <p className="text-gray-600">
+                キーワードや都道府県から、あなたにぴったりのファームステイ先を簡単に検索できます。
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition">
+              <div className="text-4xl mb-4">📅</div>
+              <h3 className="text-xl font-semibold mb-3">簡単予約</h3>
+              <p className="text-gray-600">
+                気になるファームを見つけたら、そのまま予約申込み。スムーズな予約体験を提供します。
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition">
+              <div className="text-4xl mb-4">✍️</div>
+              <h3 className="text-xl font-semibold mb-3">体験記録・共有</h3>
+              <p className="text-gray-600">
+                体験後は5段階評価やレビューを投稿。SNS機能で他のユーザーと体験を共有できます。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-green-600 text-white py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            さあ、農業体験の旅を始めよう
+          </h2>
+          <p className="text-lg mb-8">
+            今すぐ無料登録して、あなたにぴったりのファームステイを見つけましょう。
+          </p>
+          <Link href="/auth/signup">
+            <Button variant="outline" size="lg" className="bg-white text-green-600 hover:bg-gray-100 border-white">
+              無料で始める
+            </Button>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
