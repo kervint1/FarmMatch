@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
+from routers import farms, posts, reservations, users
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -16,6 +17,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(farms.router)
+app.include_router(users.router)
+app.include_router(reservations.router)
+app.include_router(posts.router)
 
 
 @app.get("/")
