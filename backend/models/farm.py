@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy import DECIMAL
-from sqlmodel import Column, Field, ForeignKey, JSON, SQLModel
+from sqlmodel import Column, Field, ForeignKey, JSON, SQLModel, Session
 
 
 class Farm(SQLModel, table=True):
