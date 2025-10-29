@@ -131,19 +131,19 @@ def seed_sample_data(engine):
         farm_images = [
             FarmImage(
                 farm_id=farms[0].id,
-                image_url="https://example.com/images/farm1_main.jpg",
+                image_url="/uploads/farm_images/farm1_main.jpg",
                 is_main=True,
                 display_order=0,
             ),
             FarmImage(
                 farm_id=farms[0].id,
-                image_url="https://example.com/images/farm1_sub1.jpg",
+                image_url="/uploads/farm_images/farm1_sub1.jpg",
                 is_main=False,
                 display_order=1,
             ),
             FarmImage(
                 farm_id=farms[1].id,
-                image_url="https://example.com/images/farm2_main.jpg",
+                image_url="/uploads/farm_images/farm2_main.jpg",
                 is_main=True,
                 display_order=0,
             ),
