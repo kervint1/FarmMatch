@@ -56,6 +56,7 @@ class FarmResponse(FarmBase):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    main_image_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -72,6 +73,7 @@ class FarmListResponse(BaseModel):
     price_per_day: int
     is_active: bool
     created_at: datetime
+    main_image_url: Optional[str] = None
 
     class Config:
         from_attributes = True

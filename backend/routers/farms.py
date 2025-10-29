@@ -1,11 +1,33 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from database import get_session
+from models import Farm, FarmImage
 from schemas.farm import FarmCreate, FarmListResponse, FarmResponse, FarmUpdate
 from services.farm import FarmService
 
 router = APIRouter(prefix="/api/farms", tags=["farms"])
+
+
+def get_farm_main_image_url(session: Session, farm_id: int) -> str | None:
+    """Get the main image URL for a farm"""
+    farm_image = session.exec(
+        select(FarmImage)
+        .where(FarmImage.farm_id == farm_id)
+        .where(FarmImage.is_main == True)
+    ).first()
+
+    if farm_image:
+        return farm_image.image_url
+
+    # If no main image, get the first image
+    farm_image = session.exec(
+        select(FarmImage)
+        .where(FarmImage.farm_id == farm_id)
+        .order_by(FarmImage.display_order)
+    ).first()
+
+    return farm_image.image_url if farm_image else None
 
 
 @router.get("", response_model=list[FarmListResponse])
@@ -31,7 +53,15 @@ async def list_farms(
         prefecture=prefecture,
         experience_type=experience_type,
     )
-    return farms
+
+    # Add main_image_url to each farm
+    farm_list = []
+    for farm in farms:
+        farm_dict = farm.model_dump()
+        farm_dict["main_image_url"] = get_farm_main_image_url(session, farm.id)
+        farm_list.append(FarmListResponse(**farm_dict))
+
+    return farm_list
 
 
 @router.get("/{farm_id}", response_model=FarmResponse)
@@ -43,7 +73,11 @@ async def get_farm(
     farm = FarmService.get_farm(session, farm_id)
     if not farm:
         raise HTTPException(status_code=404, detail="Farm not found")
-    return farm
+
+    # Add main_image_url to response
+    farm_dict = farm.model_dump()
+    farm_dict["main_image_url"] = get_farm_main_image_url(session, farm.id)
+    return FarmResponse(**farm_dict)
 
 
 @router.get("/host/{host_id}", response_model=list[FarmListResponse])
@@ -53,7 +87,15 @@ async def list_farms_by_host(
 ):
     """Get all farms owned by a specific host"""
     farms = FarmService.get_farms_by_host(session, host_id)
-    return farms
+
+    # Add main_image_url to each farm
+    farm_list = []
+    for farm in farms:
+        farm_dict = farm.model_dump()
+        farm_dict["main_image_url"] = get_farm_main_image_url(session, farm.id)
+        farm_list.append(FarmListResponse(**farm_dict))
+
+    return farm_list
 
 
 @router.post("", response_model=FarmResponse, status_code=201)

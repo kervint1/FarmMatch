@@ -1,12 +1,16 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createUser, getUserByEmail } from "@/lib/api";
 
 type UserType = "guest" | "host" | "";
 
 export default function SignupPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState<UserType>("");
   const [formData, setFormData] = useState({
@@ -14,6 +18,71 @@ export default function SignupPage() {
     email: "",
     phone: "",
   });
+
+  // ユーザー作成処理（OAuth後）
+  useEffect(() => {
+    const createUserAfterOAuth = async () => {
+      if (!session?.user) {
+        console.log("Session not ready:", session);
+        return;
+      }
+
+      const signupUserType = sessionStorage.getItem("signupUserType") as UserType;
+      if (!signupUserType) {
+        console.log("No signup user type found in sessionStorage");
+        return;
+      }
+
+      try {
+        console.log("Creating user with:", {
+          google_id: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+          user_type: signupUserType,
+        });
+
+        try {
+          await createUser({
+            google_id: session.user.id || "",
+            email: session.user.email || "",
+            name: session.user.name || "",
+            user_type: signupUserType,
+          });
+          console.log("User created successfully");
+        } catch (error: any) {
+          // ユーザーが既に存在する場合は無視
+          if (error.message.includes("User already exists")) {
+            console.log("User already exists, continuing...");
+          } else {
+            throw error;
+          }
+        }
+
+        // メールアドレスでユーザーを取得して、user_idをlocalStorageに保存
+        if (session.user.email) {
+          try {
+            const user = await getUserByEmail(session.user.email);
+            localStorage.setItem("farmMatch_userId", user.id.toString());
+            console.log("User ID saved:", user.id);
+          } catch (error) {
+            console.error("Error fetching user:", error);
+          }
+        }
+
+        // クリーンアップ
+        sessionStorage.removeItem("signupUserType");
+        sessionStorage.removeItem("signupFormData");
+
+        // マイページにリダイレクト
+        router.push("/mypage");
+      } catch (error) {
+        console.error("Error in signup process:", error);
+        // エラーが発生してもページは開く（手動でリトライ可能）
+      }
+    };
+
+    createUserAfterOAuth();
+  }, [session, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,7 +103,7 @@ export default function SignupPage() {
 
       await signIn("google", {
         redirect: true,
-        callbackUrl: "/profile/setup",
+        callbackUrl: "/signup",
       });
     } catch (error) {
       console.error("Sign up error:", error);

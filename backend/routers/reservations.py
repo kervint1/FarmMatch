@@ -66,6 +66,24 @@ async def update_reservation(
     return reservation
 
 
+@router.post("/{reservation_id}/cancel", response_model=ReservationResponse)
+async def cancel_reservation(
+    reservation_id: int,
+    session: Session = Depends(get_session),
+):
+    """Cancel a reservation (change status to cancelled)"""
+    reservation = ReservationService.get_reservation(session, reservation_id)
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+
+    # ステータスを cancelled に更新
+    reservation_update = ReservationUpdate(status="cancelled")
+    updated_reservation = ReservationService.update_reservation(
+        session, reservation_id, reservation_update
+    )
+    return updated_reservation
+
+
 @router.delete("/{reservation_id}", status_code=204)
 async def delete_reservation(
     reservation_id: int,
