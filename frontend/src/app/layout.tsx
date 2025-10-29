@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/session-provider";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -15,8 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Farm Match",
-  description: "Connect people with farm stay experiences",
+  title: "Farm Match - ファームステイマッチングアプリ",
+  description: "ファームステイ先の検索・予約から体験の記録・共有まで一元管理できるWebアプリケーション",
 };
 
 export default function RootLayout({
@@ -27,9 +29,13 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
