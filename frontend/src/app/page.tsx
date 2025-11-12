@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
@@ -55,8 +53,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
+    <div className="bg-white">
 
       {/* ヒーロー セクション */}
       <section className="bg-gradient-to-r from-green-50 to-blue-50 py-20 md:py-32">
@@ -169,8 +166,6 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
-
-      <Footer />
     </div>
   );
 }

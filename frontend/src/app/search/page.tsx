@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/layout/container";
 import { SearchFilter } from "@/components/features/search/SearchFilter";
 import { SearchResults } from "@/components/features/search/SearchResults";
@@ -70,9 +68,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-
+    <div className="bg-gray-50">
       {/* ページタイトル */}
       <section className="bg-white border-b border-gray-200 py-8">
         <Container size="lg">
@@ -127,8 +123,6 @@ export default function SearchPage() {
           </div>
         </Container>
       </div>
-
-      <Footer />
     </div>
   );
 }

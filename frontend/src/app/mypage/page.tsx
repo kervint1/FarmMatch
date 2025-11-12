@@ -3,8 +3,6 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
@@ -65,9 +63,8 @@ export default function MyPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header />
-        <Container size="md" className="flex-1 flex items-center justify-center py-20">
+      <div className="bg-white">
+        <Container size="md" className="flex items-center justify-center py-20">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               ログインが必要です
@@ -82,16 +79,13 @@ export default function MyPage() {
             </Link>
           </div>
         </Container>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-
-      <Container size="lg" className="py-8 flex-1">
+    <div className="bg-gray-50">
+      <Container size="lg" className="py-8">
         {/* プロフィールセクション */}
         {loading ? (
           <div className="text-center py-12">
@@ -236,8 +230,6 @@ export default function MyPage() {
           </div>
         )}
       </Container>
-
-      <Footer />
     </div>
   );
 }

@@ -3,8 +3,6 @@
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { ReservationForm } from "@/components/features/reservation/ReservationForm";
@@ -17,9 +15,8 @@ export default function ReservationPage() {
   // ログインチェック
   if (!session) {
     return (
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header />
-        <Container size="md" className="flex-1 flex items-center justify-center py-20">
+      <div className="bg-white">
+        <Container size="md" className="flex items-center justify-center py-20">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               ログインが必要です
@@ -34,16 +31,14 @@ export default function ReservationPage() {
             </Link>
           </div>
         </Container>
-        <Footer />
       </div>
     );
   }
 
   if (!farmId) {
     return (
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header />
-        <Container size="md" className="flex-1 flex items-center justify-center py-20">
+      <div className="bg-white">
+        <Container size="md" className="flex items-center justify-center py-20">
           <div className="text-center">
             <p className="text-gray-600 mb-4">ファームが指定されていません</p>
             <Link href="/search">
@@ -51,15 +46,13 @@ export default function ReservationPage() {
             </Link>
           </div>
         </Container>
-        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-      <Container size="lg" className="py-8 flex-1">
+    <div className="bg-gray-50">
+      <Container size="lg" className="py-8">
         {/* パンくずリスト */}
         <div className="mb-6 text-sm">
           <Link href="/" className="text-green-600 hover:text-green-700">
@@ -75,7 +68,6 @@ export default function ReservationPage() {
 
         <ReservationForm farmId={farmId} />
       </Container>
-      <Footer />
     </div>
   );
 }
