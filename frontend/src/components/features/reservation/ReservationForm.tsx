@@ -122,9 +122,55 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
     try {
       setSubmitting(true);
 
-      const userId = localStorage.getItem("farmMatch_userId");
-      if (!userId) {
-        setError("ユーザー情報が見つかりません");
+      // Get user ID from session or API
+      let dbUserId = (session.user as any)?.dbUserId;
+
+      if (!dbUserId && session.user?.email) {
+        // If dbUserId not in session, fetch it from API
+        try {
+          const userResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/email/${encodeURIComponent(session.user.email)}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (userResponse.ok) {
+            const user = await userResponse.json();
+            dbUserId = user.id;
+          } else {
+            // Try to create user if it doesn't exist
+            const createResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  google_id: (session.user as any)?.id || "unknown",
+                  email: session.user.email,
+                  name: session.user.name || "User",
+                  avatar_url: session.user.image || null,
+                  user_type: "guest",
+                }),
+              }
+            );
+
+            if (createResponse.ok) {
+              const newUser = await createResponse.json();
+              dbUserId = newUser.id;
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching/creating user:", error);
+        }
+      }
+
+      if (!dbUserId) {
+        setError("ユーザー情報が見つかりません。再度ログインしてください。");
         return;
       }
 
@@ -134,7 +180,7 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
 
       const reservation = await createReservation({
         farm_id: parseInt(String(farmId)),
-        guest_id: parseInt(String(userId)),
+        guest_id: parseInt(String(dbUserId)),
         start_date: formData.startDate,
         end_date: formData.endDate,
         num_guests: numPeople,
@@ -293,8 +339,9 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
             {/* ファーム画像 */}
             <img
               src={
-                farm.main_image_url ||
-                "http://localhost:8000/uploads/farm_images/farm1_main.jpg"
+                farm.main_image_url
+                  ? `${process.env.NEXT_PUBLIC_API_URL}${farm.main_image_url}`
+                  : "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
               }
               alt={farm.name}
               className="w-full h-40 rounded-lg object-cover mb-4"

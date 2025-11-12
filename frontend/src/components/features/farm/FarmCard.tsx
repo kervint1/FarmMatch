@@ -33,7 +33,7 @@ export function FarmCard({
     <Link href={`/farms/${id}`}>
       <Card hoverable className="h-full">
         <CardImage
-          src={main_image_url || "http://localhost:8000/uploads/farm_images/farm1_main.jpg"}
+          src={main_image_url ? `${process.env.NEXT_PUBLIC_API_URL}${main_image_url}` : "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"}
           alt={name}
         />
         <CardBody>
