@@ -148,6 +148,50 @@ PostgreSQL 17を使用。Dev Container環境では自動的に起動します。
 - **ユーザー**: farmatch
 - **パスワード**: farmatch_dev
 
+### マイグレーション
+
+Alembicを使用してデータベーススキーマを管理しています。
+
+#### 初回セットアップ（マイグレーション実行）
+
+```bash
+# マイグレーションを実行してテーブルを作成
+alembic upgrade head
+
+# サンプルデータをシード（開発環境用）
+python -c "from init_db import create_db_and_tables, seed_sample_data; engine = create_db_and_tables(); seed_sample_data(engine)"
+```
+
+#### 新しいテーブル/カラムを追加した場合
+
+```bash
+# 新しいマイグレーションファイルを自動生成
+alembic revision --autogenerate -m "テーブル名の説明"
+
+# マイグレーションを実行
+alembic upgrade head
+```
+
+#### マイグレーション履歴の確認
+
+```bash
+# 現在のマイグレーション状態を確認
+alembic current
+
+# マイグレーション履歴を表示
+alembic history --indicate-current
+```
+
+#### 前のバージョンにロールバック
+
+```bash
+# 1つ前のバージョンに戻す
+alembic downgrade -1
+
+# 特定のリビジョンに戻す
+alembic downgrade <revision_id>
+```
+
 ## デプロイ
 
 ### Heroku

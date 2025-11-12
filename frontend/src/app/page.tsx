@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
-import { Card, CardBody, CardImage, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardBody, CardTitle } from "@/components/ui/card";
+import { AuthButtons } from "@/components/features/auth/AuthButtons";
+import { CtaButton } from "@/components/features/auth/CtaButton";
+import { FarmCard } from "@/components/features/farm/FarmCard";
 import { getFarms } from "@/lib/api";
 
 export default function HomePage() {
-  const { data: session } = useSession();
   const [featuredFarms, setFeaturedFarms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,8 +53,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
+    <div className="bg-white">
 
       {/* ヒーロー セクション */}
       <section className="bg-gradient-to-r from-green-50 to-blue-50 py-20 md:py-32">
@@ -71,26 +68,7 @@ export default function HomePage() {
                 Farm Match は、農業体験をしたい人と提供したい農家を繋ぐプラットフォームです。全国の農場で本物の農業を体験しよう。
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                {session ? (
-                  <Link href="/search">
-                    <Button variant="primary" size="lg" fullWidth>
-                      ファームを探す
-                    </Button>
-                  </Link>
-                ) : (
-                  <>
-                    <Link href="/signup" className="flex-1">
-                      <Button variant="primary" size="lg" fullWidth>
-                        無料で始める
-                      </Button>
-                    </Link>
-                    <Link href="/login" className="flex-1">
-                      <Button variant="outline" size="lg" fullWidth>
-                        ログイン
-                      </Button>
-                    </Link>
-                  </>
-                )}
+                <AuthButtons />
               </div>
             </div>
 
@@ -154,37 +132,7 @@ export default function HomePage() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {featuredFarms.map((farm) => (
-                  <Link key={farm.id} href={`/farms/${farm.id}`}>
-                    <Card hoverable className="h-full">
-                      <CardImage
-                        src={farm.main_image_url || "http://localhost:8000/uploads/farm_images/farm1_main.jpg"}
-                        alt={farm.name}
-                      />
-                      <CardBody>
-                        <div className="flex items-start justify-between mb-2">
-                          <CardTitle className="flex-1">{farm.name}</CardTitle>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">{farm.location}</p>
-
-                        <div className="flex items-center gap-2 mb-4">
-                          <Badge variant="primary" size="sm">
-                            {farm.experience_type}
-                          </Badge>
-                        </div>
-
-                        <div className="flex items-center gap-1 mb-4">
-                          <span className="text-yellow-400 text-lg">⭐</span>
-                          <span className="font-semibold text-gray-900">
-                            {farm.rating || "未評価"}
-                          </span>
-                        </div>
-
-                        <div className="text-lg font-bold text-green-600">
-                          ¥{farm.price_per_person?.toLocaleString()}
-                        </div>
-                      </CardBody>
-                    </Card>
-                  </Link>
+                  <FarmCard key={farm.id} {...farm} />
                 ))}
               </div>
 
@@ -214,18 +162,10 @@ export default function HomePage() {
             <p className="text-lg text-green-100 mb-8">
               今すぐ Farm Match に参加して、新しい農業との出会いを始めましょう
             </p>
-            {!session && (
-              <Link href="/signup">
-                <Button variant="secondary" size="lg">
-                  無料登録
-                </Button>
-              </Link>
-            )}
+            <CtaButton />
           </div>
         </Container>
       </section>
-
-      <Footer />
     </div>
   );
 }
