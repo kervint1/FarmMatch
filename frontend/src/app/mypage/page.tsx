@@ -3,26 +3,22 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { getUser, getReservations, getReviews, getUserByEmail, cancelReservation } from "@/lib/api";
+import { ReservationList } from "@/components/features/reservation/ReservationList";
+import { getUser, getUserByEmail } from "@/lib/api";
 
 export default function MyPage() {
   const { data: session } = useSession();
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [reservations, setReservations] = useState<any[]>([]);
   const [myReviews, setMyReviews] = useState<any[]>([]);
   const [wishlist, setWishlist] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [canceling, setCanceling] = useState<string | null>(null);
-  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,29 +28,27 @@ export default function MyPage() {
         setLoading(true);
 
         // localStorageまたはメールアドレスでユーザーIDを取得
-        let userId: string | null = localStorage.getItem("farmMatch_userId");
+        let currentUserId: string | null = localStorage.getItem("farmMatch_userId");
 
-        if (!userId && session.user.email) {
+        if (!currentUserId && session.user.email) {
           try {
             const user = await getUserByEmail(session.user.email);
-            userId = user.id.toString();
-            localStorage.setItem("farmMatch_userId", userId);
+            currentUserId = user.id.toString();
+            localStorage.setItem("farmMatch_userId", currentUserId);
           } catch (error) {
             console.error("Error fetching user by email:", error);
             return;
           }
         }
 
-        if (!userId) {
+        if (!currentUserId) {
           console.error("Could not determine user ID");
           return;
         }
 
-        const userData = await getUser(userId);
+        setUserId(currentUserId);
+        const userData = await getUser(currentUserId);
         setUserProfile(userData);
-
-        const reservationsData = await getReservations(0, 100, userId);
-        setReservations(reservationsData);
 
         // TODO: ユーザーのレビュー取得エンドポイントが実装されたら有効化
         // const reviewsData = await getReviews(0, 100, undefined, userId);
@@ -68,51 +62,6 @@ export default function MyPage() {
 
     fetchUserData();
   }, [session?.user]);
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "確定";
-      case "pending":
-        return "確認待ち";
-      default:
-        return status;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "success";
-      case "pending":
-        return "warning";
-      default:
-        return "secondary";
-    }
-  };
-
-  const handleCancelReservation = async (reservationId: number) => {
-    if (!confirm("この予約をキャンセルしてもよろしいですか？")) {
-      return;
-    }
-
-    try {
-      setCanceling(reservationId.toString());
-      setCancelError(null);
-      await cancelReservation(reservationId.toString());
-      // キャンセル成功後、予約一覧を更新
-      setReservations(
-        reservations.map((res) =>
-          res.id === reservationId ? { ...res, status: "cancelled" } : res
-        )
-      );
-    } catch (error: any) {
-      console.error("Error canceling reservation:", error);
-      setCancelError(error.message || "キャンセルに失敗しました");
-    } finally {
-      setCanceling(null);
-    }
-  };
 
   if (!session) {
     return (
@@ -199,86 +148,15 @@ export default function MyPage() {
 
         {/* 予約管理タブ */}
         {activeTab === "profile" && (
-          <div className="space-y-6">
-            {cancelError && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                {cancelError}
-              </div>
-            )}
-            {reservations.length > 0 ? (
-              reservations.map((reservation: any) => (
-                <Card key={reservation.id}>
-                  <CardBody>
-                    <div className="flex gap-6">
-                      <img
-                        src={reservation.farm?.main_image_url || "http://localhost:8000/uploads/farm_images/farm1_main.jpg"}
-                        alt={reservation.farm?.name}
-                        className="w-32 h-24 rounded-lg object-cover"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {reservation.farm?.name}
-                          </h3>
-                          <Badge
-                            variant={getStatusColor(
-                              reservation.status
-                            ) as any}
-                            size="sm"
-                          >
-                            {getStatusLabel(reservation.status)}
-                          </Badge>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
-                          <div>
-                            <p className="text-gray-600">日時</p>
-                            <p className="text-gray-900">{new Date(reservation.date).toLocaleDateString("ja-JP")}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">人数</p>
-                            <p className="text-gray-900">
-                              {reservation.num_people}人
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">合計金額</p>
-                            <p className="text-lg font-bold text-green-600">
-                              ¥{reservation.total_price?.toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-3">
-                          <Button variant="secondary" size="sm">
-                            詳細を見る
-                          </Button>
-                          {reservation.status === "pending" && (
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => handleCancelReservation(reservation.id)}
-                              disabled={canceling === reservation.id.toString()}
-                              isLoading={canceling === reservation.id.toString()}
-                            >
-                              キャンセル
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              ))
-            ) : (
-              <Card>
-                <CardBody className="text-center py-12">
-                  <p className="text-gray-600 mb-4">予約がありません</p>
-                  <Link href="/search">
-                    <Button variant="primary">ファームを探す</Button>
-                  </Link>
-                </CardBody>
-              </Card>
-            )}
-          </div>
+          userId ? (
+            <ReservationList userId={userId} />
+          ) : (
+            <Card>
+              <CardBody className="text-center py-12">
+                <p className="text-gray-600 mb-4">予約情報を読み込み中...</p>
+              </CardBody>
+            </Card>
+          )
         )}
 
         {/* レビュータブ */}
