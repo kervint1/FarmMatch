@@ -1,34 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cancelReservation } from "@/lib/api";
+import { cancelReservation, getReservations } from "@/lib/api";
 
 interface Reservation {
   id: number;
-  farm: {
+  farm_id: number;
+  guest_id: number;
+  farm?: {
     name: string;
     main_image_url?: string;
   };
   start_date: string;
   end_date: string;
   status: string;
-  total_price: number;
+  total_amount: number;
+  num_guests: number;
 }
 
 interface ReservationListProps {
-  reservations: Reservation[];
+  userId?: string;
+  reservations?: Reservation[];
   onReservationUpdate?: () => void;
 }
 
 export function ReservationList({
-  reservations,
+  userId,
+  reservations: propReservations,
   onReservationUpdate,
 }: ReservationListProps) {
+  const [reservations, setReservations] = useState<Reservation[]>(propReservations || []);
+  const [loading, setLoading] = useState(!propReservations && !!userId);
   const [canceling, setCanceling] = useState<string | null>(null);
   const [cancelError, setCancelError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchReservations = async () => {
+      if (!userId || propReservations) return;
+
+      try {
+        setLoading(true);
+        const data = await getReservations(0, 100, userId);
+        setReservations(data || []);
+      } catch (error) {
+        console.error("Error fetching reservations:", error);
+        setReservations([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservations();
+  }, [userId, propReservations]);
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -76,7 +102,17 @@ export function ReservationList({
     }
   };
 
-  if (reservations.length === 0) {
+  if (loading) {
+    return (
+      <Card>
+        <CardBody className="text-center py-12">
+          <p className="text-gray-600 mb-4">読み込み中...</p>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  if (!reservations || reservations.length === 0) {
     return (
       <Card>
         <CardBody className="text-center py-12">
@@ -100,8 +136,9 @@ export function ReservationList({
             <div className="flex gap-6">
               <img
                 src={
-                  reservation.farm?.main_image_url ||
-                  "http://localhost:8000/uploads/farm_images/farm1_main.jpg"
+                  reservation.farm?.main_image_url
+                    ? `${process.env.NEXT_PUBLIC_API_URL}${reservation.farm.main_image_url}`
+                    : "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
                 }
                 alt={reservation.farm?.name}
                 className="w-32 h-24 rounded-lg object-cover"
@@ -139,7 +176,7 @@ export function ReservationList({
                 </div>
 
                 <p className="text-lg font-bold text-green-600 mb-4">
-                  ¥{reservation.total_price?.toLocaleString()}
+                  ¥{reservation.total_amount?.toLocaleString()}
                 </p>
 
                 <div className="flex gap-3">
