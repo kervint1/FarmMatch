@@ -24,18 +24,6 @@ async def list_users(
     return users
 
 
-@router.get("/{user_id}", response_model=UserResponse)
-async def get_user(
-    user_id: int,
-    session: Session = Depends(get_session),
-):
-    """Get a specific user by ID"""
-    user = UserService.get_user(session, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
-
 @router.get("/email/{email}", response_model=UserResponse)
 async def get_user_by_email(
     email: str,
@@ -43,6 +31,18 @@ async def get_user_by_email(
 ):
     """Get user by email"""
     user = UserService.get_user_by_email(session, email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+@router.get("/{user_id}", response_model=UserResponse)
+async def get_user(
+    user_id: int,
+    session: Session = Depends(get_session),
+):
+    """Get a specific user by ID"""
+    user = UserService.get_user(session, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
