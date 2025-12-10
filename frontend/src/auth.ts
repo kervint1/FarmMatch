@@ -40,6 +40,7 @@ const authOptions: NextAuthOptions = {
           if (response.ok) {
             const user = await response.json();
             dbUserId = user.id;
+            token.userType = user.user_type;
           } else {
             // User doesn't exist, create them
             const createResponse = await fetch(`${API_URL}/api/users`, {
@@ -59,6 +60,7 @@ const authOptions: NextAuthOptions = {
             if (createResponse.ok) {
               const newUser = await createResponse.json();
               dbUserId = newUser.id;
+              token.userType = newUser.user_type;
             }
           }
 
@@ -82,6 +84,7 @@ const authOptions: NextAuthOptions = {
         session.user.id = (token.userId as string) || "";
         (session.user as any).dbUserId = token.dbUserId;
         (session.user as any).email = token.email;
+        (session.user as any).userType = token.userType;
       }
       return session;
     },

@@ -476,7 +476,9 @@ export default function MyPage() {
                 <CardBody className="text-center py-12">
                   <p className="text-gray-600 mb-4">ウィッシュリストは空です</p>
                   <Link href="/search">
-                    <Button variant="primary">ファームを探す</Button>
+                    <Button variant="primary">
+                      {userProfile?.user_type === "host" ? "ゲストを探す" : "ファームを探す"}
+                    </Button>
                   </Link>
                 </CardBody>
               </Card>
