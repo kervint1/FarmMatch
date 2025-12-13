@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 from core.config import settings
-from routers import farms, posts, reservations, users
+from routers import auth, farms, posts, reservations, users
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -21,6 +21,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router)
 app.include_router(farms.router)
 app.include_router(users.router)
 app.include_router(reservations.router)
