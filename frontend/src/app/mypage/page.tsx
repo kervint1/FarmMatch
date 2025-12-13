@@ -7,6 +7,7 @@ import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
 import { ReservationList } from "@/components/features/reservation/ReservationList";
+import { HostReservations } from "@/components/reservations/host-reservations";
 import { getUser, getUserByEmail, updateUser } from "@/lib/api";
 import { uploadUserAvatar } from "@/lib/api/users";
 
@@ -27,6 +28,7 @@ export default function MyPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [wishlist] = useState<any[]>([]);
 
   // プロフィール編集用ステート
   const [isEditing, setIsEditing] = useState(false);
@@ -360,6 +362,18 @@ export default function MyPage() {
             >
               予約履歴
             </button>
+            {userProfile?.user_type === "host" && (
+              <button
+                onClick={() => setActiveTab("host-reservations")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "host-reservations"
+                    ? "border-green-500 text-green-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                予約管理
+              </button>
+            )}
             <button
               onClick={() => setActiveTab("wishlist")}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -440,6 +454,17 @@ export default function MyPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">予約履歴</h2>
             {userId ? (
               <ReservationList userId={userId} />
+            ) : (
+              <p className="text-gray-600">ユーザー情報の読み込みに失敗しました</p>
+            )}
+          </div>
+        )}
+
+        {/* ホスト予約管理タブ */}
+        {activeTab === "host-reservations" && userProfile?.user_type === "host" && (
+          <div className="bg-white rounded-lg border border-gray-200 p-8">
+            {userProfile?.id ? (
+              <HostReservations hostId={userProfile.id} />
             ) : (
               <p className="text-gray-600">ユーザー情報の読み込みに失敗しました</p>
             )}

@@ -2,12 +2,37 @@
 
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { loginWithGoogleId } from "@/lib/api/auth";
 
 export function Header() {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   console.log("Current session userType:", session?.user.userType);
+
+  // JWTトークンを取得してlocalStorageに保存
+  useEffect(() => {
+    const fetchJWT = async () => {
+      if (session?.user?.id) {
+        // 既にトークンがある場合はスキップ
+        const existingToken = localStorage.getItem("farmMatch_jwt");
+        if (existingToken) {
+          return;
+        }
+
+        try {
+          // バックエンドからJWTトークンを取得
+          const response = await loginWithGoogleId(session.user.id);
+          localStorage.setItem("farmMatch_jwt", response.access_token);
+          console.log("JWT token obtained and stored");
+        } catch (error) {
+          console.error("Failed to obtain JWT token:", error);
+        }
+      }
+    };
+
+    fetchJWT();
+  }, [session?.user?.id]);
 
   return (
     <header className="bg-white shadow">
@@ -49,7 +74,10 @@ export function Header() {
                     <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full" />
                   )}
                   <button
-                    onClick={() => signOut()}
+                    onClick={() => {
+                      localStorage.removeItem("farmMatch_jwt");
+                      signOut();
+                    }}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                   >
                     ログアウト
@@ -108,7 +136,10 @@ export function Header() {
                   マイページ
                 </Link>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => {
+                    localStorage.removeItem("farmMatch_jwt");
+                    signOut();
+                  }}
                   className="w-full mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   ログアウト
