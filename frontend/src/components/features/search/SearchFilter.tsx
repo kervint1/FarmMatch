@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
 import { Input } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
@@ -88,13 +87,11 @@ export function SearchFilter({
     <div className="space-y-6">
       {/* 都道府県 */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">
-          都道府県
-        </label>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">都道府県</label>
         <select
           value={location}
           onChange={(e) => onLocationChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 bg-white"
         >
           {prefectures.map((pref) => (
             <option key={pref} value={pref === "全て" ? "" : pref}>
@@ -106,13 +103,11 @@ export function SearchFilter({
 
       {/* 体験タイプ */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">
-          体験タイプ
-        </label>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">体験タイプ</label>
         <select
           value={type}
           onChange={(e) => onTypeChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 bg-white"
         >
           <option value="">全て</option>
           {experienceTypes.map((exp) => (
@@ -125,17 +120,15 @@ export function SearchFilter({
 
       {/* 価格範囲 */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">
-          1泊の価格（円）
-        </label>
-        <div className="flex gap-3">
+        <label className="block text-sm font-semibold text-gray-900 mb-2">1泊の価格（円）</label>
+        <div className="flex gap-3 text-gray-900 bg-white">
           <Input
             type="number"
             placeholder="最小"
             value={priceMin}
             onChange={(e) => onPriceMinChange(e.target.value)}
           />
-          <span className="flex items-center text-gray-500">〜</span>
+          <span className="flex items-center text-gray-500 ">〜</span>
           <Input
             type="number"
             placeholder="最大"

@@ -299,8 +299,8 @@ export default function MyPage() {
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900">{userProfile.name}</h3>
-                      <p className="text-gray-600">{userProfile.email}</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-gray-900">{userProfile.email}</p>
+                      <p className="text-sm text-gray-900 mt-1 font-medium">
                         {userProfile.user_type === "admin" && "管理者"}
                         {userProfile.user_type === "host" && "農家ホスト"}
                         {userProfile.user_type === "guest" && "ゲスト"}
@@ -309,24 +309,24 @@ export default function MyPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">連絡先情報</h4>
+                        <h4 className="text-sm font-bold text-gray-900 mb-2">連絡先情報</h4>
                         <div className="space-y-2">
-                          <p className="text-sm">
-                            <span className="font-medium">電話番号:</span>{" "}
+                          <p className="text-sm text-gray-900">
+                            <span className="font-semibold">電話番号:</span>{" "}
                             {userProfile.phone_number || "未設定"}
                           </p>
                         </div>
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">所在地</h4>
+                        <h4 className="text-sm font-bold text-gray-900 mb-2">所在地</h4>
                         <div className="space-y-2">
-                          <p className="text-sm">
-                            <span className="font-medium">都道府県:</span>{" "}
+                          <p className="text-sm text-gray-900">
+                            <span className="font-semibold">都道府県:</span>{" "}
                             {userProfile.prefecture || "未設定"}
                           </p>
-                          <p className="text-sm">
-                            <span className="font-medium">市区町村:</span>{" "}
+                          <p className="text-sm text-gray-900">
+                            <span className="font-semibold">市区町村:</span>{" "}
                             {userProfile.city || "未設定"}
                           </p>
                         </div>
@@ -405,8 +405,8 @@ export default function MyPage() {
                   />
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">{userProfile.name}</h3>
-                    <p className="text-gray-600">{userProfile.email}</p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-gray-900">{userProfile.email}</p>
+                    <p className="text-sm text-gray-900 mt-1 font-medium">
                       {userProfile.user_type === "admin" && "管理者"}
                       {userProfile.user_type === "host" && "農家ホスト"}
                       {userProfile.user_type === "guest" && "ゲスト"}
@@ -416,24 +416,24 @@ export default function MyPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">連絡先情報</h4>
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">連絡先情報</h4>
                     <div className="space-y-2">
-                      <p className="text-sm">
-                        <span className="font-medium">電話番号:</span>{" "}
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">電話番号:</span>{" "}
                         {userProfile.phone_number || "未設定"}
                       </p>
                     </div>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">所在地</h4>
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">所在地</h4>
                     <div className="space-y-2">
-                      <p className="text-sm">
-                        <span className="font-medium">都道府県:</span>{" "}
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">都道府県:</span>{" "}
                         {userProfile.prefecture || "未設定"}
                       </p>
-                      <p className="text-sm">
-                        <span className="font-medium">市区町村:</span>{" "}
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">市区町村:</span>{" "}
                         {userProfile.city || "未設定"}
                       </p>
                     </div>
