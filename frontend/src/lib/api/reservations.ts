@@ -59,6 +59,10 @@ export async function updateReservation(
   });
 }
 
+export async function getReservation(reservationId: string) {
+  return apiCall<any>(`/api/reservations/${reservationId}`);
+}
+
 export async function cancelReservation(id: string) {
   return apiCall<any>(`/api/reservations/${id}/cancel`, {
     method: "POST",

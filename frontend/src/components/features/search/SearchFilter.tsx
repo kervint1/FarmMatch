@@ -121,14 +121,14 @@ export function SearchFilter({
       {/* 価格範囲 */}
       <div>
         <label className="block text-sm font-semibold text-gray-900 mb-2">1泊の価格（円）</label>
-        <div className="flex gap-3 text-gray-900 bg-white">
+        <div className="flex gap-3">
           <Input
             type="number"
             placeholder="最小"
             value={priceMin}
             onChange={(e) => onPriceMinChange(e.target.value)}
           />
-          <span className="flex items-center text-gray-500 ">〜</span>
+          <span className="flex items-center text-gray-900">〜</span>
           <Input
             type="number"
             placeholder="最大"

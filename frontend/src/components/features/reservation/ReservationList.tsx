@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,7 @@ export function ReservationList({
   reservations: propReservations,
   onReservationUpdate,
 }: ReservationListProps) {
+  const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>(propReservations || []);
   const [loading, setLoading] = useState(!propReservations && !!userId);
   const [canceling, setCanceling] = useState<string | null>(null);
@@ -60,6 +62,8 @@ export function ReservationList({
     switch (status) {
       case "confirmed":
         return "確定";
+      case "approved":
+        return "承認済み";
       case "pending":
         return "確認待ち";
       case "cancelled":
@@ -72,6 +76,8 @@ export function ReservationList({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
+        return "success";
+      case "approved":
         return "success";
       case "pending":
         return "warning";
@@ -193,6 +199,17 @@ export function ReservationList({
                       {canceling === reservation.id.toString()
                         ? "キャンセル中..."
                         : "キャンセル"}
+                    </Button>
+                  )}
+                  {reservation.status === "approved" && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() =>
+                        router.push(`/reservation/${reservation.id}/review`)
+                      }
+                    >
+                      レビューを書く
                     </Button>
                   )}
                 </div>
