@@ -14,6 +14,12 @@ export async function apiCall<T>(
     "Content-Type": "application/json",
   };
 
+  // JWTトークンをlocalStorageから取得してAuthorizationヘッダーに追加
+  const token = localStorage.getItem("farmMatch_jwt");
+  if (token) {
+    defaultHeaders["Authorization"] = `Bearer ${token}`;
+  }
+
   const response = await fetch(url, {
     ...options,
     headers: {

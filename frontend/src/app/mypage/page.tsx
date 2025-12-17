@@ -7,6 +7,8 @@ import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
 import { ReservationList } from "@/components/features/reservation/ReservationList";
+import { HostReservations } from "@/components/reservations/host-reservations";
+import { HostReviews } from "@/components/features/reservations/HostReviews";
 import { getUser, getUserByEmail, updateUser } from "@/lib/api";
 import { uploadUserAvatar } from "@/lib/api/users";
 
@@ -27,6 +29,7 @@ export default function MyPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [wishlist] = useState<any[]>([]);
 
   // プロフィール編集用ステート
   const [isEditing, setIsEditing] = useState(false);
@@ -297,8 +300,8 @@ export default function MyPage() {
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900">{userProfile.name}</h3>
-                      <p className="text-gray-600">{userProfile.email}</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-gray-900">{userProfile.email}</p>
+                      <p className="text-sm text-gray-900 mt-1 font-medium">
                         {userProfile.user_type === "admin" && "管理者"}
                         {userProfile.user_type === "host" && "農家ホスト"}
                         {userProfile.user_type === "guest" && "ゲスト"}
@@ -307,24 +310,24 @@ export default function MyPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">連絡先情報</h4>
+                        <h4 className="text-sm font-bold text-gray-900 mb-2">連絡先情報</h4>
                         <div className="space-y-2">
-                          <p className="text-sm">
-                            <span className="font-medium">電話番号:</span>{" "}
+                          <p className="text-sm text-gray-900">
+                            <span className="font-semibold">電話番号:</span>{" "}
                             {userProfile.phone_number || "未設定"}
                           </p>
                         </div>
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">所在地</h4>
+                        <h4 className="text-sm font-bold text-gray-900 mb-2">所在地</h4>
                         <div className="space-y-2">
-                          <p className="text-sm">
-                            <span className="font-medium">都道府県:</span>{" "}
+                          <p className="text-sm text-gray-900">
+                            <span className="font-semibold">都道府県:</span>{" "}
                             {userProfile.prefecture || "未設定"}
                           </p>
-                          <p className="text-sm">
-                            <span className="font-medium">市区町村:</span>{" "}
+                          <p className="text-sm text-gray-900">
+                            <span className="font-semibold">市区町村:</span>{" "}
                             {userProfile.city || "未設定"}
                           </p>
                         </div>
@@ -360,6 +363,30 @@ export default function MyPage() {
             >
               予約履歴
             </button>
+            {userProfile?.user_type === "host" && (
+              <>
+                <button
+                  onClick={() => setActiveTab("host-reservations")}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === "host-reservations"
+                      ? "border-green-500 text-green-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  予約管理
+                </button>
+                <button
+                  onClick={() => setActiveTab("reviews")}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === "reviews"
+                      ? "border-green-500 text-green-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  受け取ったレビュー
+                </button>
+              </>
+            )}
             <button
               onClick={() => setActiveTab("wishlist")}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -391,8 +418,8 @@ export default function MyPage() {
                   />
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">{userProfile.name}</h3>
-                    <p className="text-gray-600">{userProfile.email}</p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-gray-900">{userProfile.email}</p>
+                    <p className="text-sm text-gray-900 mt-1 font-medium">
                       {userProfile.user_type === "admin" && "管理者"}
                       {userProfile.user_type === "host" && "農家ホスト"}
                       {userProfile.user_type === "guest" && "ゲスト"}
@@ -402,24 +429,24 @@ export default function MyPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">連絡先情報</h4>
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">連絡先情報</h4>
                     <div className="space-y-2">
-                      <p className="text-sm">
-                        <span className="font-medium">電話番号:</span>{" "}
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">電話番号:</span>{" "}
                         {userProfile.phone_number || "未設定"}
                       </p>
                     </div>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">所在地</h4>
+                    <h4 className="text-sm font-bold text-gray-900 mb-3">所在地</h4>
                     <div className="space-y-2">
-                      <p className="text-sm">
-                        <span className="font-medium">都道府県:</span>{" "}
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">都道府県:</span>{" "}
                         {userProfile.prefecture || "未設定"}
                       </p>
-                      <p className="text-sm">
-                        <span className="font-medium">市区町村:</span>{" "}
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">市区町村:</span>{" "}
                         {userProfile.city || "未設定"}
                       </p>
                     </div>
@@ -440,6 +467,28 @@ export default function MyPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">予約履歴</h2>
             {userId ? (
               <ReservationList userId={userId} />
+            ) : (
+              <p className="text-gray-600">ユーザー情報の読み込みに失敗しました</p>
+            )}
+          </div>
+        )}
+
+        {/* ホスト予約管理タブ */}
+        {activeTab === "host-reservations" && userProfile?.user_type === "host" && (
+          <div className="bg-white rounded-lg border border-gray-200 p-8">
+            {userProfile?.id ? (
+              <HostReservations hostId={userProfile.id} />
+            ) : (
+              <p className="text-gray-600">ユーザー情報の読み込みに失敗しました</p>
+            )}
+          </div>
+        )}
+
+        {/* 受け取ったレビュータブ */}
+        {activeTab === "reviews" && userProfile?.user_type === "host" && (
+          <div className="bg-white rounded-lg border border-gray-200 p-8">
+            {userProfile?.id ? (
+              <HostReviews userId={userProfile.id} />
             ) : (
               <p className="text-gray-600">ユーザー情報の読み込みに失敗しました</p>
             )}
@@ -476,7 +525,9 @@ export default function MyPage() {
                 <CardBody className="text-center py-12">
                   <p className="text-gray-600 mb-4">ウィッシュリストは空です</p>
                   <Link href="/search">
-                    <Button variant="primary">ファームを探す</Button>
+                    <Button variant="primary">
+                      {userProfile?.user_type === "host" ? "ゲストを探す" : "ファームを探す"}
+                    </Button>
                   </Link>
                 </CardBody>
               </Card>

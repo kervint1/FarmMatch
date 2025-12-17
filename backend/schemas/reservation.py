@@ -56,3 +56,9 @@ class ReservationListResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ApprovalRequest(BaseModel):
+    """Schema for approving a reservation"""
+
+    approval_message: Optional[str] = None

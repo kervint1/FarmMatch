@@ -59,8 +59,41 @@ export async function updateReservation(
   });
 }
 
+export async function getReservation(reservationId: string) {
+  return apiCall<any>(`/api/reservations/${reservationId}`);
+}
+
 export async function cancelReservation(id: string) {
   return apiCall<any>(`/api/reservations/${id}/cancel`, {
     method: "POST",
+  });
+}
+
+export async function getHostReservations(
+  hostId: number,
+  skip?: number,
+  limit?: number,
+  status?: string
+) {
+  const params = new URLSearchParams();
+  if (skip !== undefined) params.append("skip", skip.toString());
+  if (limit !== undefined) params.append("limit", limit.toString());
+  if (status) params.append("status", status);
+
+  const queryString = params.toString();
+  const endpoint = `/api/reservations/host/${hostId}${queryString ? `?${queryString}` : ""}`;
+
+  return apiCall<any[]>(endpoint);
+}
+
+export async function approveReservation(
+  reservationId: number,
+  approvalMessage?: string
+) {
+  return apiCall<any>(`/api/reservations/${reservationId}/approve`, {
+    method: "POST",
+    body: JSON.stringify({
+      approval_message: approvalMessage || null,
+    }),
   });
 }

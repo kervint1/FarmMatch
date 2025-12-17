@@ -2,11 +2,37 @@
 
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { loginWithGoogleId } from "@/lib/api/auth";
 
 export function Header() {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  console.log("Current session userType:", session?.user.userType);
+
+  // JWTトークンを取得してlocalStorageに保存
+  useEffect(() => {
+    const fetchJWT = async () => {
+      if (session?.user?.id) {
+        // 既にトークンがある場合はスキップ
+        const existingToken = localStorage.getItem("farmMatch_jwt");
+        if (existingToken) {
+          return;
+        }
+
+        try {
+          // バックエンドからJWTトークンを取得
+          const response = await loginWithGoogleId(session.user.id);
+          localStorage.setItem("farmMatch_jwt", response.access_token);
+          console.log("JWT token obtained and stored");
+        } catch (error) {
+          console.error("Failed to obtain JWT token:", error);
+        }
+      }
+    };
+
+    fetchJWT();
+  }, [session?.user?.id]);
 
   return (
     <header className="bg-white shadow">
@@ -17,44 +43,41 @@ export function Header() {
             <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">🌾</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900 hidden sm:inline">
-              Farm Match
-            </span>
+            <span className="text-2xl font-bold text-gray-900 hidden sm:inline">Farm Match</span>
           </Link>
 
           {/* デスクトップナビゲーション */}
           <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/search"
-              className="text-gray-600 hover:text-gray-900 font-medium"
-            >
+            <Link href="/search" className="text-gray-600 hover:text-gray-900 font-medium">
               ファームを探す
             </Link>
-            <Link
-              href="/community"
-              className="text-gray-600 hover:text-gray-900 font-medium"
-            >
+            {/* ファーム登録ボタン - host のみ表示 */}
+            {session && (session.user as { userType?: string }).userType === "host" && (
+              <Link
+                href="/farms/register"
+                className="text-gray-600 hover:text-gray-900 font-medium"
+              >
+                ファーム登録
+              </Link>
+            )}
+            <Link href="/community" className="text-gray-600 hover:text-gray-900 font-medium">
               コミュニティ
             </Link>
 
             {session ? (
               <>
-                <Link
-                  href="/mypage"
-                  className="text-gray-600 hover:text-gray-900 font-medium"
-                >
+                <Link href="/mypage" className="text-gray-600 hover:text-gray-900 font-medium">
                   マイページ
                 </Link>
                 <div className="flex items-center gap-4">
                   {session.user?.image && (
-                    <img
-                      src={session.user.image}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full"
-                    />
+                    <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full" />
                   )}
                   <button
-                    onClick={() => signOut()}
+                    onClick={() => {
+                      localStorage.removeItem("farmMatch_jwt");
+                      signOut();
+                    }}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                   >
                     ログアウト
@@ -80,16 +103,8 @@ export function Header() {
           </div>
 
           {/* モバイルメニューボタン */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -103,28 +118,28 @@ export function Header() {
         {/* モバイルメニュー */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 border-t pt-4">
-            <Link
-              href="/search"
-              className="block py-2 text-gray-600 hover:text-gray-900"
-            >
+            <Link href="/search" className="block py-2 text-gray-600 hover:text-gray-900">
               ファームを探す
             </Link>
-            <Link
-              href="/community"
-              className="block py-2 text-gray-600 hover:text-gray-900"
-            >
+            {/* ファーム登録ボタン - host のみ表示 */}
+            {session && (session.user as { userType?: string }).userType === "host" && (
+              <Link href="/farms/register" className="block py-2 text-gray-600 hover:text-gray-900">
+                ファーム登録
+              </Link>
+            )}
+            <Link href="/community" className="block py-2 text-gray-600 hover:text-gray-900">
               コミュニティ
             </Link>
             {session ? (
               <>
-                <Link
-                  href="/mypage"
-                  className="block py-2 text-gray-600 hover:text-gray-900"
-                >
+                <Link href="/mypage" className="block py-2 text-gray-600 hover:text-gray-900">
                   マイページ
                 </Link>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => {
+                    localStorage.removeItem("farmMatch_jwt");
+                    signOut();
+                  }}
                   className="w-full mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   ログアウト

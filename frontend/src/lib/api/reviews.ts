@@ -28,8 +28,11 @@ export async function getReviews(
 
 export async function createReview(data: {
   reservation_id: string;
+  farm_id: number;
+  guest_id: number;
   rating: number;
   comment?: string;
+  experience_date: string;
 }) {
   return apiCall<any>(`/api/reviews`, {
     method: "POST",
