@@ -20,6 +20,7 @@ interface Reservation {
   status: string;
   total_amount: number;
   num_guests: number;
+  has_review?: boolean;  // レビュー済みかどうか
 }
 
 interface ReservationListProps {
@@ -186,7 +187,11 @@ export function ReservationList({
                 </p>
 
                 <div className="flex gap-3">
-                  <Button variant="secondary" size="sm">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => router.push(`/reservation/${reservation.id}`)}
+                  >
                     詳細を見る
                   </Button>
                   {reservation.status === "pending" && (
@@ -201,7 +206,7 @@ export function ReservationList({
                         : "キャンセル"}
                     </Button>
                   )}
-                  {reservation.status === "approved" && (
+                  {reservation.status === "approved" && !reservation.has_review && (
                     <Button
                       variant="primary"
                       size="sm"
@@ -211,6 +216,11 @@ export function ReservationList({
                     >
                       レビューを書く
                     </Button>
+                  )}
+                  {reservation.status === "approved" && reservation.has_review && (
+                    <Badge variant="success" size="sm">
+                      レビュー済み
+                    </Badge>
                   )}
                 </div>
               </div>
