@@ -69,13 +69,39 @@ def seed_sample_data(engine):
                 prefecture="神奈川県",
                 city="横浜市",
             ),
+            User(
+                google_id="google_111222",
+                email="farmer2@example.com",
+                name="山田農園主",
+                user_type="host",
+                phone_number="090-1111-2222",
+                prefecture="北海道",
+                city="富良野市",
+            ),
+            User(
+                google_id="google_333444",
+                email="farmer3@example.com",
+                name="田中牧場主",
+                user_type="host",
+                phone_number="090-3333-4444",
+                prefecture="熊本県",
+                city="阿蘇市",
+            ),
+            User(
+                google_id="google_555666",
+                email="guest2@example.com",
+                name="旅する三郎",
+                user_type="guest",
+                phone_number="090-5555-6666",
+                prefecture="大阪府",
+                city="大阪市",
+            ),
         ]
         for user in users:
             session.add(user)
         session.commit()
-        session.refresh(users[0])
-        session.refresh(users[1])
-        session.refresh(users[2])
+        for user in users:
+            session.refresh(user)
         print(f"✅ Created {len(users)} users")
 
         # Create farms
@@ -119,12 +145,56 @@ def seed_sample_data(engine):
                 access_info="安曇野ICから車で20分",
                 is_active=True,
             ),
+            Farm(
+                host_id=users[3].id,
+                name="富良野ラベンダーファーム",
+                description="広大なラベンダー畑での収穫体験。初夏には一面紫色の絶景が広がります。",
+                prefecture="北海道",
+                city="富良野市",
+                address="富良野市字中御料",
+                latitude=Decimal("43.3417"),
+                longitude=Decimal("142.3831"),
+                experience_type="agriculture",
+                price_per_day=9000,
+                price_per_night=13000,
+                max_guests=5,
+                facilities={
+                    "wifi": True,
+                    "parking": True,
+                    "shower": True,
+                    "kitchen": False,
+                },
+                access_info="富良野駅から車で10分",
+                is_active=True,
+            ),
+            Farm(
+                host_id=users[4].id,
+                name="阿蘇高原牧場",
+                description="雄大な阿蘇の自然の中で馬や牛とのふれあい体験。大自然を満喫できます。",
+                prefecture="熊本県",
+                city="阿蘇市",
+                address="阿蘇市一の宮町宮地",
+                latitude=Decimal("32.8841"),
+                longitude=Decimal("131.0353"),
+                experience_type="livestock",
+                price_per_day=8500,
+                price_per_night=14000,
+                max_guests=10,
+                facilities={
+                    "wifi": False,
+                    "parking": True,
+                    "shower": True,
+                    "kitchen": True,
+                },
+                access_info="阿蘇駅から車で15分、無料送迎あり",
+                is_active=True,
+            ),
         ]
         for farm in farms:
             session.add(farm)
         session.commit()
-        session.refresh(farms[0])
-        session.refresh(farms[1])
+        for farm in farms:
+            session.refresh(farm)
         print(f"✅ Created {len(farms)} farms")
 
         # Create farm images
@@ -177,15 +247,46 @@ def seed_sample_data(engine):
                 status="completed",
                 contact_phone="090-3456-7890",
             ),
+            Reservation(
+                guest_id=users[2].id,
+                farm_id=farms[2].id,
+                start_date=today - timedelta(days=60),
+                end_date=today - timedelta(days=58),
+                num_guests=2,
+                total_amount=27000,
+                status="completed",
+                contact_phone="090-3456-7890",
+            ),
+            Reservation(
+                guest_id=users[5].id,
+                farm_id=farms[0].id,
+                start_date=today - timedelta(days=45),
+                end_date=today - timedelta(days=44),
+                num_guests=1,
+                total_amount=8000,
+                status="completed",
+                contact_phone="090-5555-6666",
+                message="全国を旅しながら農業体験をしています！",
+            ),
+            Reservation(
+                guest_id=users[5].id,
+                farm_id=farms[3].id,
+                start_date=today - timedelta(days=20),
+                end_date=today - timedelta(days=19),
+                num_guests=1,
+                total_amount=8500,
+                status="completed",
+                contact_phone="090-5555-6666",
+            ),
         ]
         for reservation in reservations:
             session.add(reservation)
         session.commit()
-        session.refresh(reservations[0])
-        session.refresh(reservations[1])
+        for reservation in reservations:
+            session.refresh(reservation)
         print(f"✅ Created {len(reservations)} reservations")
 
-        # Create review
+        # Create reviews
         reviews = [
             Review(
                 reservation_id=reservations[1].id,
@@ -194,7 +295,31 @@ def seed_sample_data(engine):
                 rating=5,
                 comment="とても楽しい体験でした！ホストの方も親切で、また訪れたいです。",
                 experience_date=today - timedelta(days=29),
-            )
+            ),
+            Review(
+                reservation_id=reservations[2].id,
+                guest_id=users[2].id,
+                farm_id=farms[2].id,
+                rating=5,
+                comment="ラベンダー畑が本当に美しかったです！収穫体験も楽しくて、良い思い出になりました。",
+                experience_date=today - timedelta(days=58),
+            ),
+            Review(
+                reservation_id=reservations[3].id,
+                guest_id=users[5].id,
+                farm_id=farms[0].id,
+                rating=4,
+                comment="有機野菜の収穫体験が素晴らしかったです。軽井沢の自然も最高でした。",
+                experience_date=today - timedelta(days=44),
+            ),
+            Review(
+                reservation_id=reservations[4].id,
+                guest_id=users[5].id,
+                farm_id=farms[3].id,
+                rating=5,
+                comment="阿蘇の大自然の中での牧場体験は感動的でした！馬との触れ合いが特に良かったです。",
+                experience_date=today - timedelta(days=19),
+            ),
         ]
         for review in reviews:
             session.add(review)

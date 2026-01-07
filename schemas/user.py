@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
@@ -55,3 +55,30 @@ class UserListResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ReceivedReviewInfo(BaseModel):
+    """農家が受け取ったレビュー情報"""
+
+    id: int
+    guest_id: int
+    guest_name: str
+    rating: int
+    comment: Optional[str]
+    experience_date: date
+    farm_id: int
+    farm_name: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class HostReceivedReviewsResponse(BaseModel):
+    """農家が受け取ったレビュー一覧のレスポンス"""
+
+    host_id: int
+    host_name: str
+    total_reviews: int
+    average_rating: float
+    reviews: list[ReceivedReviewInfo]
