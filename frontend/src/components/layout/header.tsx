@@ -66,6 +66,9 @@ export function Header() {
 
             {session ? (
               <>
+                <Link href="/stamp-rally" className="text-gray-600 hover:text-gray-900 font-medium">
+                  🗾 スタンプラリー
+                </Link>
                 <Link href="/mypage" className="text-gray-600 hover:text-gray-900 font-medium">
                   マイページ
                 </Link>
@@ -132,6 +135,9 @@ export function Header() {
             </Link>
             {session ? (
               <>
+                <Link href="/stamp-rally" className="block py-2 text-gray-600 hover:text-gray-900">
+                  🗾 スタンプラリー
+                </Link>
                 <Link href="/mypage" className="block py-2 text-gray-600 hover:text-gray-900">
                   マイページ
                 </Link>
