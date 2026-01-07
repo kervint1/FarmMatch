@@ -7,6 +7,8 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { UserProfileModal } from "@/components/features/community/UserProfileModal";
+import { getUserByEmail } from "@/lib/api";
 
 interface Post {
   id: number;
@@ -17,6 +19,7 @@ interface Post {
   created_at: string;
   updated_at: string;
   user_name?: string;
+  user_type?: string;
   farm_id?: number;
   farm_name?: string;
 }
@@ -28,6 +31,7 @@ interface Comment {
   content: string;
   created_at: string;
   user_name?: string;
+  user_type?: string;
 }
 
 export default function PostDetailPage() {
@@ -40,6 +44,12 @@ export default function PostDetailPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
+  const [selectedUser, setSelectedUser] = useState<{
+    id: number;
+    name: string;
+    type: "host" | "guest";
+  } | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (postId) {
@@ -47,6 +57,30 @@ export default function PostDetailPage() {
       fetchComments();
     }
   }, [postId]);
+
+  // ユーザーID取得
+  useEffect(() => {
+    const fetchUserId = async () => {
+      if (!session?.user) return;
+
+      // LocalStorageから取得を試みる
+      let currentUserId: string | null = localStorage.getItem("farmMatch_userId");
+
+      if (!currentUserId && session.user.email) {
+        try {
+          const user = await getUserByEmail(session.user.email);
+          currentUserId = user.id.toString();
+          localStorage.setItem("farmMatch_userId", currentUserId);
+        } catch (error) {
+          console.error("Error fetching user by email:", error);
+        }
+      }
+
+      setUserId(currentUserId);
+    };
+
+    fetchUserId();
+  }, [session]);
 
   const fetchPost = async () => {
     try {
@@ -92,7 +126,7 @@ export default function PostDetailPage() {
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session || !newComment.trim()) return;
+    if (!session || !userId || !newComment.trim()) return;
 
     try {
       const response = await fetch(`http://localhost:8000/api/posts/${postId}/comments`, {
@@ -102,7 +136,7 @@ export default function PostDetailPage() {
         },
         body: JSON.stringify({
           content: newComment,
-          user_id: 1, // TODO: 実際のユーザーIDを使用
+          user_id: parseInt(userId),
           post_id: parseInt(postId),
         }),
       });
@@ -161,11 +195,20 @@ export default function PostDetailPage() {
           <CardBody>
             {/* 投稿ヘッダー */}
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <button
+                onClick={() =>
+                  setSelectedUser({
+                    id: post.user_id,
+                    name: post.user_name || `ユーザー${post.user_id}`,
+                    type: (post.user_type === "host" ? "host" : "guest") as "host" | "guest",
+                  })
+                }
+                className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 hover:bg-green-200 transition-colors cursor-pointer"
+              >
                 <span className="text-green-600 font-semibold text-2xl">
                   {post.user_name?.[0] || "U"}
                 </span>
-              </div>
+              </button>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 text-lg mb-1">
                   {post.user_name || `ユーザー${post.user_id}`}
@@ -262,11 +305,20 @@ export default function PostDetailPage() {
                 <Card key={comment.id}>
                   <CardBody>
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <button
+                        onClick={() =>
+                          setSelectedUser({
+                            id: comment.user_id,
+                            name: comment.user_name || `ユーザー${comment.user_id}`,
+                            type: (comment.user_type === "host" ? "host" : "guest") as "host" | "guest",
+                          })
+                        }
+                        className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 hover:bg-gray-200 transition-colors cursor-pointer"
+                      >
                         <span className="text-gray-600 font-semibold">
                           {comment.user_name?.[0] || "U"}
                         </span>
-                      </div>
+                      </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-semibold text-gray-900">
@@ -285,6 +337,16 @@ export default function PostDetailPage() {
             </div>
           )}
         </div>
+
+        {/* ユーザープロフィールモーダル */}
+        {selectedUser && (
+          <UserProfileModal
+            userId={selectedUser.id}
+            userName={selectedUser.name}
+            userType={selectedUser.type}
+            onClose={() => setSelectedUser(null)}
+          />
+        )}
       </Container>
     </div>
   );

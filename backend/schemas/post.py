@@ -33,6 +33,9 @@ class PostResponse(PostBase):
     like_count: int
     created_at: datetime
     updated_at: datetime
+    user_name: Optional[str] = None
+    user_type: Optional[str] = None
+    farm_name: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -47,6 +50,10 @@ class PostListResponse(BaseModel):
     content: str
     like_count: int
     created_at: datetime
+    user_name: Optional[str] = None
+    user_type: Optional[str] = None
+    farm_id: Optional[int] = None
+    farm_name: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -73,6 +80,8 @@ class CommentResponse(CommentBase):
     user_id: int
     created_at: datetime
     updated_at: datetime
+    user_name: Optional[str] = None
+    user_type: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -86,6 +95,8 @@ class CommentListResponse(BaseModel):
     user_id: int
     content: str
     created_at: datetime
+    user_name: Optional[str] = None
+    user_type: Optional[str] = None
 
     class Config:
         from_attributes = True

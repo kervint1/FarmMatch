@@ -1,4 +1,5 @@
 import { apiCall } from "@/lib/utils/api-client";
+import type { HostReceivedReviewsResponse } from "@/types/user";
 
 export async function createUser(data: {
   google_id: string;
@@ -36,4 +37,8 @@ export async function uploadUserAvatar(userId: string, file: File) {
     body: formData,
     headers: {}, // Let browser set Content-Type for FormData
   });
+}
+
+export async function getHostReceivedReviews(userId: string) {
+  return apiCall<HostReceivedReviewsResponse>(`/api/users/${userId}/reviews/received`);
 }
