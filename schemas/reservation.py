@@ -53,6 +53,7 @@ class ReservationListResponse(BaseModel):
     status: str
     total_amount: int
     created_at: datetime
+    has_review: bool = False  # レビューが存在するかどうか
 
     class Config:
         from_attributes = True

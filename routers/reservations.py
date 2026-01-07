@@ -4,6 +4,7 @@ from sqlmodel import Session, select
 from database import get_session
 from models.farm import Farm
 from models.user import User
+from models import Review
 from routers.auth import get_current_user
 from schemas.reservation import (
     ApprovalRequest,
@@ -31,7 +32,21 @@ async def list_reservations(
     reservations = ReservationService.get_reservations(
         session, skip=skip, limit=limit, guest_id=guest_id, farm_id=farm_id, status=status
     )
-    return reservations
+
+    # レビューの有無をチェック
+    result = []
+    for reservation in reservations:
+        review = session.exec(
+            select(Review).where(Review.reservation_id == reservation.id)
+        ).first()
+
+        reservation_dict = {
+            **reservation.model_dump(),
+            "has_review": review is not None
+        }
+        result.append(ReservationListResponse(**reservation_dict))
+
+    return result
 
 
 @router.get("/{reservation_id}", response_model=ReservationResponse)
@@ -139,7 +154,21 @@ async def get_host_reservations(
     query = query.offset(skip).limit(limit).order_by(Reservation.created_at.desc())
 
     reservations = session.exec(query).all()
-    return reservations
+
+    # レビューの有無をチェック
+    result = []
+    for reservation in reservations:
+        review = session.exec(
+            select(Review).where(Review.reservation_id == reservation.id)
+        ).first()
+
+        reservation_dict = {
+            **reservation.model_dump(),
+            "has_review": review is not None
+        }
+        result.append(ReservationListResponse(**reservation_dict))
+
+    return result
 
 
 @router.post("/{reservation_id}/approve", response_model=ReservationResponse)
