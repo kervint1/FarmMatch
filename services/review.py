@@ -61,6 +61,15 @@ class ReviewService:
         session.add(review)
         session.commit()
         session.refresh(review)
+
+        # スタンプコレクションを自動同期
+        from services.stamp import StampService
+
+        try:
+            StampService.sync_stamp_from_review(session, review.id)
+        except Exception as e:
+            print(f"Warning: Failed to sync stamp collection: {e}")
+
         return review
 
     @staticmethod
