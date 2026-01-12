@@ -1,6 +1,8 @@
+
 /**
  * Stamp Rally Type Definitions
  */
+
 
 export interface PrefectureStamp {
   prefecture_code: string;
@@ -13,12 +15,14 @@ export interface PrefectureStamp {
   created_at: string;
 }
 
+
 export interface StampCollectionSummary {
   total_prefectures: number; // 訪問都道府県数
   total_visits: number; // 総訪問回数
   total_farms: number; // 訪問ファーム数
   completion_rate: number; // 達成率 (0-100)
 }
+
 
 export interface PrefectureStampStatus {
   prefecture_code: string;
@@ -32,10 +36,12 @@ export interface PrefectureStampStatus {
   unique_farms_count: number;
 }
 
+
 export interface StampCollectionResponse {
   summary: StampCollectionSummary;
   stamps: PrefectureStampStatus[];
 }
+
 
 export interface VisitedFarmInfo {
   farm_id: number;
@@ -44,6 +50,7 @@ export interface VisitedFarmInfo {
   experience_type: string;
   review_id: number;
 }
+
 
 export interface PrefectureDetailResponse {
   prefecture_code: string;
@@ -54,6 +61,24 @@ export interface PrefectureDetailResponse {
   unique_farms_count: number;
   visited_farms: VisitedFarmInfo[];
 }
+
+
+export interface RankingEntry {
+  rank: number;
+  guest_id: number;
+  guest_name: string;
+  avatar_url: string | null;
+  total_prefectures: number;
+  completion_rate: number;
+}
+
+
+export interface RankingResponse {
+  rankings: RankingEntry[];
+  my_ranking: RankingEntry | null;
+  total_users: number;
+}
+
 
 // 地方区分マッピング
 export const REGION_NAMES: Record<string, string> = {
@@ -66,3 +91,5 @@ export const REGION_NAMES: Record<string, string> = {
   shikoku: "四国",
   kyushu: "九州・沖縄",
 };
+
+

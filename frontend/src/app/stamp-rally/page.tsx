@@ -1,4 +1,6 @@
+
 "use client";
+
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -8,9 +10,11 @@ import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { StampProgress } from "@/components/features/stamp/StampProgress";
 import { StampGrid } from "@/components/features/stamp/StampGrid";
+import { RankingList } from "@/components/features/stamp/RankingList";
 import { getUserByEmail } from "@/lib/api";
 import { getUserStampCollection } from "@/lib/api/stamps";
 import type { StampCollectionResponse } from "@/types/stamp";
+
 
 export default function StampRallyPage() {
   const { data: session } = useSession();
@@ -21,6 +25,8 @@ export default function StampRallyPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"stamps" | "ranking">("stamps");
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,13 +35,16 @@ export default function StampRallyPage() {
         return;
       }
 
+
       try {
         setLoading(true);
         setError(null);
 
+
         // Get user ID from localStorage or email
         let currentUserId: string | null =
           localStorage.getItem("farmMatch_userId");
+
 
         if (!currentUserId && session.user.email) {
           try {
@@ -49,12 +58,15 @@ export default function StampRallyPage() {
           }
         }
 
+
         if (!currentUserId) {
           setError("ユーザーIDを取得できませんでした");
           return;
         }
 
+
         setUserId(currentUserId);
+
 
         // Fetch stamp collection
         const data = await getUserStampCollection(currentUserId);
@@ -67,8 +79,10 @@ export default function StampRallyPage() {
       }
     };
 
+
     fetchData();
   }, [session]);
+
 
   // Not logged in
   if (!session && !loading) {
@@ -94,6 +108,7 @@ export default function StampRallyPage() {
     );
   }
 
+
   // Loading state
   if (loading) {
     return (
@@ -107,6 +122,7 @@ export default function StampRallyPage() {
       </div>
     );
   }
+
 
   // Error state
   if (error) {
@@ -128,6 +144,7 @@ export default function StampRallyPage() {
     );
   }
 
+
   // Main content
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -145,28 +162,64 @@ export default function StampRallyPage() {
           </p>
         </div>
 
+
         {collection && (
           <>
-            {/* 進捗表示 */}
-            <div className="mb-8">
-              <StampProgress summary={collection.summary} />
-            </div>
+            {/* タブナビゲーション */}
+            <nav className="flex space-x-8 border-b border-gray-200 mb-8">
+              <button
+                onClick={() => setActiveTab("stamps")}
+                className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "stamps"
+                    ? "border-green-500 text-green-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                マイスタンプ
+              </button>
+              <button
+                onClick={() => setActiveTab("ranking")}
+                className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "ranking"
+                    ? "border-green-500 text-green-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                ランキング
+              </button>
+            </nav>
 
-            {/* スタンプ一覧 */}
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  スタンプコレクション
-                </h2>
-                <p className="text-gray-600">
-                  訪問済みの都道府県はカラーで表示されます。クリックすると詳細が確認できます。
-                </p>
-              </div>
 
-              {userId && (
-                <StampGrid stamps={collection.stamps} userId={userId} />
-              )}
-            </div>
+            {/* タブコンテンツ */}
+            {activeTab === "stamps" ? (
+              <>
+                {/* 進捗表示 */}
+                <div className="mb-8">
+                  <StampProgress summary={collection.summary} />
+                </div>
+
+
+                {/* スタンプ一覧 */}
+                <div className="bg-white rounded-lg border shadow-sm p-6">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                      スタンプコレクション
+                    </h2>
+                    <p className="text-gray-600">
+                      訪問済みの都道府県はカラーで表示されます。クリックすると詳細が確認できます。
+                    </p>
+                  </div>
+
+
+                  {userId && (
+                    <StampGrid stamps={collection.stamps} userId={userId} />
+                  )}
+                </div>
+              </>
+            ) : (
+              <RankingList userId={userId} />
+            )}
+
 
             {/* ヘルプセクション */}
             <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-6">
@@ -218,3 +271,5 @@ export default function StampRallyPage() {
     </div>
   );
 }
+
+
