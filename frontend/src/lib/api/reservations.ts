@@ -88,11 +88,13 @@ export async function getHostReservations(
 
 export async function approveReservation(
   reservationId: number,
+  hostId: number,
   approvalMessage?: string
 ) {
   return apiCall<any>(`/api/reservations/${reservationId}/approve`, {
     method: "POST",
     body: JSON.stringify({
+      host_id: hostId,
       approval_message: approvalMessage || null,
     }),
   });

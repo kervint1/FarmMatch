@@ -47,3 +47,23 @@ export async function createFarm(data: {
     body: JSON.stringify(data),
   });
 }
+
+export async function uploadFarmImage(
+  farmId: string | number,
+  file: File,
+  isMain: boolean = false
+) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const params = new URLSearchParams();
+  if (isMain) params.append("is_main", "true");
+
+  const queryString = params.toString();
+  const endpoint = `/api/farms/${farmId}/images${queryString ? `?${queryString}` : ""}`;
+
+  return apiCall<any>(endpoint, {
+    method: "POST",
+    body: formData,
+  });
+}

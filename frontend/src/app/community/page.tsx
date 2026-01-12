@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { UserProfileModal } from "@/components/features/community/UserProfileModal";
+import { getUserByEmail } from "@/lib/api";
 
 interface Post {
   id: number;
@@ -15,6 +17,7 @@ interface Post {
   like_count: number;
   created_at: string;
   user_name?: string;
+  user_type?: string;
   farm_id?: number;
   farm_name?: string;
 }
@@ -28,10 +31,40 @@ export default function CommunityPage() {
     title: "",
     content: "",
   });
+  const [selectedUser, setSelectedUser] = useState<{
+    id: number;
+    name: string;
+    type: "host" | "guest";
+  } | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  // ユーザーID取得
+  useEffect(() => {
+    const fetchUserId = async () => {
+      if (!session?.user) return;
+
+      // LocalStorageから取得を試みる
+      let currentUserId: string | null = localStorage.getItem("farmMatch_userId");
+
+      if (!currentUserId && session.user.email) {
+        try {
+          const user = await getUserByEmail(session.user.email);
+          currentUserId = user.id.toString();
+          localStorage.setItem("farmMatch_userId", currentUserId);
+        } catch (error) {
+          console.error("Error fetching user by email:", error);
+        }
+      }
+
+      setUserId(currentUserId);
+    };
+
+    fetchUserId();
+  }, [session]);
 
   const fetchPosts = async () => {
     try {
@@ -49,7 +82,14 @@ export default function CommunityPage() {
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session) return;
+    if (!session || !userId) {
+      return;
+    }
+
+    const postData = {
+      ...newPost,
+      user_id: parseInt(userId),
+    };
 
     try {
       const response = await fetch("http://localhost:8000/api/posts", {
@@ -57,16 +97,15 @@ export default function CommunityPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...newPost,
-          user_id: 1, // TODO: 実際のユーザーIDを使用
-        }),
+        body: JSON.stringify(postData),
       });
 
       if (response.ok) {
         setNewPost({ title: "", content: "" });
         setShowCreateModal(false);
         fetchPosts();
+      } else {
+        console.error("Failed to create post:", response.status);
       }
     } catch (error) {
       console.error("Error creating post:", error);
@@ -200,11 +239,20 @@ export default function CommunityPage() {
                 <CardBody>
                   {/* 投稿ヘッダー */}
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <button
+                      onClick={() =>
+                        setSelectedUser({
+                          id: post.user_id,
+                          name: post.user_name || `ユーザー${post.user_id}`,
+                          type: (post.user_type === "host" ? "host" : "guest") as "host" | "guest",
+                        })
+                      }
+                      className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 hover:bg-green-200 transition-colors cursor-pointer"
+                    >
                       <span className="text-green-600 font-semibold text-lg">
                         {post.user_name?.[0] || "U"}
                       </span>
-                    </div>
+                    </button>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-900">
@@ -271,6 +319,16 @@ export default function CommunityPage() {
               </div>
             </CardBody>
           </Card>
+        )}
+
+        {/* ユーザープロフィールモーダル */}
+        {selectedUser && (
+          <UserProfileModal
+            userId={selectedUser.id}
+            userName={selectedUser.name}
+            userType={selectedUser.type}
+            onClose={() => setSelectedUser(null)}
+          />
         )}
       </Container>
     </div>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cancelReservation, getReservations } from "@/lib/api";
+import { getImageUrl } from "@/lib/utils/image-url";
 
 interface Reservation {
   id: number;
@@ -20,6 +21,7 @@ interface Reservation {
   status: string;
   total_amount: number;
   num_guests: number;
+  has_review?: boolean;  // レビュー済みかどうか
 }
 
 interface ReservationListProps {
@@ -142,9 +144,8 @@ export function ReservationList({
             <div className="flex gap-6">
               <img
                 src={
-                  reservation.farm?.main_image_url
-                    ? `${process.env.NEXT_PUBLIC_API_URL}${reservation.farm.main_image_url}`
-                    : "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
+                  getImageUrl(reservation.farm?.main_image_url) ||
+                  "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
                 }
                 alt={reservation.farm?.name}
                 className="w-32 h-24 rounded-lg object-cover"
@@ -186,7 +187,11 @@ export function ReservationList({
                 </p>
 
                 <div className="flex gap-3">
-                  <Button variant="secondary" size="sm">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => router.push(`/reservation/${reservation.id}`)}
+                  >
                     詳細を見る
                   </Button>
                   {reservation.status === "pending" && (
@@ -201,7 +206,7 @@ export function ReservationList({
                         : "キャンセル"}
                     </Button>
                   )}
-                  {reservation.status === "approved" && (
+                  {reservation.status === "approved" && !reservation.has_review && (
                     <Button
                       variant="primary"
                       size="sm"
@@ -211,6 +216,11 @@ export function ReservationList({
                     >
                       レビューを書く
                     </Button>
+                  )}
+                  {reservation.status === "approved" && reservation.has_review && (
+                    <Badge variant="success" size="sm">
+                      レビュー済み
+                    </Badge>
                   )}
                 </div>
               </div>

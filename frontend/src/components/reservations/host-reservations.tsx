@@ -83,7 +83,7 @@ export function HostReservations({ hostId }: HostReservationsProps) {
 
     try {
       setSubmitting(true);
-      await approveReservation(selectedReservation.id, approvalMessage);
+      await approveReservation(selectedReservation.id, hostId, approvalMessage);
       alert("予約を承認しました。ゲストにメール通知が送信されます。");
       setApprovalModalOpen(false);
       setSelectedReservation(null);

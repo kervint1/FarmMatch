@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 from database import get_session
 from models.farm import Farm
 from models.user import User
-from routers.auth import get_current_user
+from models import Review
 from schemas.reservation import (
     ApprovalRequest,
     ReservationCreate,
@@ -31,7 +31,21 @@ async def list_reservations(
     reservations = ReservationService.get_reservations(
         session, skip=skip, limit=limit, guest_id=guest_id, farm_id=farm_id, status=status
     )
-    return reservations
+
+    # レビューの有無をチェック
+    result = []
+    for reservation in reservations:
+        review = session.exec(
+            select(Review).where(Review.reservation_id == reservation.id)
+        ).first()
+
+        reservation_dict = {
+            **reservation.model_dump(),
+            "has_review": review is not None
+        }
+        result.append(ReservationListResponse(**reservation_dict))
+
+    return result
 
 
 @router.get("/{reservation_id}", response_model=ReservationResponse)
@@ -139,7 +153,21 @@ async def get_host_reservations(
     query = query.offset(skip).limit(limit).order_by(Reservation.created_at.desc())
 
     reservations = session.exec(query).all()
-    return reservations
+
+    # レビューの有無をチェック
+    result = []
+    for reservation in reservations:
+        review = session.exec(
+            select(Review).where(Review.reservation_id == reservation.id)
+        ).first()
+
+        reservation_dict = {
+            **reservation.model_dump(),
+            "has_review": review is not None
+        }
+        result.append(ReservationListResponse(**reservation_dict))
+
+    return result
 
 
 @router.post("/{reservation_id}/approve", response_model=ReservationResponse)
@@ -147,16 +175,14 @@ async def approve_reservation(
     reservation_id: int,
     approval_data: ApprovalRequest,
     session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
 ):
     """
     Approve a reservation and send email notification to the guest
 
     Args:
         reservation_id: ID of the reservation to approve
-        approval_data: Optional approval message from host
+        approval_data: Approval data including host_id and optional message
         session: Database session
-        current_user: Currently authenticated user (must be the farm host)
 
     Returns:
         Updated reservation
@@ -183,8 +209,8 @@ async def approve_reservation(
     if not farm:
         raise HTTPException(status_code=404, detail="Farm not found")
 
-    # Verify that current user is the farm host
-    if farm.host_id != current_user.id:
+    # Verify that the provided host_id matches the farm's host
+    if farm.host_id != approval_data.host_id:
         raise HTTPException(
             status_code=403,
             detail="Only the farm host can approve reservations"

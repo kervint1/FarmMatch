@@ -163,8 +163,20 @@ async def create_review(
     session: Session = Depends(get_session),
 ):
     """Create a new review"""
-    review = ReviewService.create_review(session, review_data)
-    return review
+    try:
+        review = ReviewService.create_review(session, review_data)
+        return review
+    except Exception as e:
+        # Check for unique constraint violation
+        if "unique" in str(e).lower() or "duplicate" in str(e).lower():
+            raise HTTPException(
+                status_code=422,
+                detail="この予約は既にレビュー済みです"
+            )
+        raise HTTPException(
+            status_code=500,
+            detail=f"レビューの作成に失敗しました: {str(e)}"
+        )
 
 
 @router.delete("/api/reviews/{review_id}", status_code=204)

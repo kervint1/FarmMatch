@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
 import { getFarm } from "@/lib/api";
+import { getImageUrl } from "@/lib/utils/image-url";
 
 interface FarmDetailsProps {
   farmId: string;
@@ -59,7 +60,7 @@ export function FarmDetails({ farmId }: FarmDetailsProps) {
         <div className="rounded-lg overflow-hidden shadow-lg mb-6">
           <img
             src={
-              farm.main_image_url ||
+              getImageUrl(farm.main_image_url) ||
               "http://localhost:8000/uploads/farm_images/farm1_main.jpg"
             }
             alt={farm.name}

@@ -5,7 +5,13 @@ from pathlib import Path
 
 from database import get_session
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
-from schemas.user import UserCreate, UserListResponse, UserResponse, UserUpdate
+from schemas.user import (
+    HostReceivedReviewsResponse,
+    UserCreate,
+    UserListResponse,
+    UserResponse,
+    UserUpdate,
+)
 from services.user import UserService
 from sqlmodel import Session
 
@@ -145,3 +151,19 @@ async def upload_user_avatar(
         raise HTTPException(status_code=500, detail="Failed to update user avatar")
 
     return updated_user
+
+
+@router.get("/{user_id}/reviews/received", response_model=HostReceivedReviewsResponse)
+async def get_host_received_reviews(
+    user_id: int,
+    session: Session = Depends(get_session),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+):
+    """Get reviews received by a host for their farms"""
+    result = UserService.get_host_received_reviews(session, user_id, skip=skip, limit=limit)
+    if not result:
+        raise HTTPException(
+            status_code=404, detail="Host not found or user is not a host"
+        )
+    return result
