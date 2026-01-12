@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardBody, CardImage, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getImageUrl } from "@/lib/utils/image-url";
 
 interface FarmCardProps {
   id: number;
@@ -33,7 +34,7 @@ export function FarmCard({
     <Link href={`/farms/${id}`}>
       <Card hoverable className="h-full">
         <CardImage
-          src={main_image_url ? `${process.env.NEXT_PUBLIC_API_URL}${main_image_url}` : "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"}
+          src={getImageUrl(main_image_url) || "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"}
           alt={name}
         />
         <CardBody>

@@ -10,9 +10,12 @@ export async function apiCall<T>(
 ): Promise<T> {
   const url = `${API_URL}${endpoint}`;
 
-  const defaultHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const defaultHeaders: Record<string, string> = {};
+
+  // bodyがFormDataの場合はContent-Typeを設定しない（ブラウザが自動設定）
+  if (!(options.body instanceof FormData)) {
+    defaultHeaders["Content-Type"] = "application/json";
+  }
 
   // JWTトークンをlocalStorageから取得してAuthorizationヘッダーに追加
   const token = localStorage.getItem("farmMatch_jwt");

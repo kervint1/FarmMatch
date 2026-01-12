@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { ReviewForm } from "@/components/features/review/ReviewForm";
 import { getReservation } from "@/lib/api";
+import { getImageUrl } from "@/lib/utils/image-url";
 
 export default function ReviewPage() {
   const { data: session } = useSession();
@@ -126,9 +127,8 @@ export default function ReviewPage() {
             <div className="flex gap-4">
               <img
                 src={
-                  reservation.farm?.main_image_url
-                    ? `${process.env.NEXT_PUBLIC_API_URL}${reservation.farm.main_image_url}`
-                    : "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
+                  getImageUrl(reservation.farm?.main_image_url) ||
+                  "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
                 }
                 alt={reservation.farm?.name}
                 className="w-24 h-24 rounded-lg object-cover"

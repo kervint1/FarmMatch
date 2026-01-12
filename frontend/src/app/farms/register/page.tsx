@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { Container } from "@/components/layout/container";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createFarm } from "@/lib/api/farms";
+import { createFarm, uploadFarmImage } from "@/lib/api/farms";
 import { getUserByEmail } from "@/lib/api/users";
 
 const PREFECTURES = [
@@ -43,6 +43,10 @@ export default function FarmRegisterPage() {
     access_info: "",
   });
 
+  const [images, setImages] = useState<File[]>([]);
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
   useEffect(() => {
     // 認証チェック
     if (status === "unauthenticated") {
@@ -65,6 +69,38 @@ export default function FarmRegisterPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // 最大5枚まで
+    const newImages = [...images, ...files].slice(0, 5);
+    setImages(newImages);
+
+    // プレビュー作成
+    const newPreviews = newImages.map((file) => URL.createObjectURL(file));
+    setImagePreviews(newPreviews);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = images.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+
+    setImages(newImages);
+    setImagePreviews(newPreviews);
+
+    // メイン画像のインデックスを調整
+    if (mainImageIndex === index) {
+      setMainImageIndex(0);
+    } else if (mainImageIndex > index) {
+      setMainImageIndex(mainImageIndex - 1);
+    }
+  };
+
+  const handleSetMainImage = (index: number) => {
+    setMainImageIndex(index);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -164,6 +200,20 @@ export default function FarmRegisterPage() {
       }
 
       const result = await createFarm(payload);
+
+      // 画像をアップロード
+      if (images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          const isMain = i === mainImageIndex;
+          try {
+            await uploadFarmImage(result.id, images[i], isMain);
+          } catch (uploadError) {
+            console.error(`Failed to upload image ${i}:`, uploadError);
+            // 画像アップロードが失敗しても続行
+          }
+        }
+      }
+
       alert("ファームが登録されました！");
       router.push(`/farms/${result.id}`);
     } catch (err: any) {
@@ -366,6 +416,82 @@ export default function FarmRegisterPage() {
               className="w-full px-4 py-2 bg-white border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
               placeholder="10"
             />
+          </div>
+
+          {/* 画像アップロード */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              ファーム画像（最大5枚）
+            </label>
+            <div className="space-y-4">
+              {/* 画像選択ボタン */}
+              {images.length < 5 && (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="farm-images"
+                  />
+                  <label
+                    htmlFor="farm-images"
+                    className="inline-block px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer font-medium"
+                  >
+                    画像を選択
+                  </label>
+                  <p className="text-sm text-gray-600 mt-2">
+                    JPEG, PNG, GIF, WebP形式、最大10MB
+                  </p>
+                </div>
+              )}
+
+              {/* 画像プレビュー */}
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div
+                      key={index}
+                      className="relative group aspect-square rounded-lg overflow-hidden border-2 border-gray-300"
+                    >
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+
+                      {/* メイン画像バッジ */}
+                      {mainImageIndex === index && (
+                        <div className="absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold">
+                          メイン
+                        </div>
+                      )}
+
+                      {/* アクションボタン */}
+                      <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        {mainImageIndex !== index && (
+                          <button
+                            type="button"
+                            onClick={() => handleSetMainImage(index)}
+                            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                          >
+                            メインに設定
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                        >
+                          削除
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* アクセス情報 */}

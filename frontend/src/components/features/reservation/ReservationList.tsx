@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cancelReservation, getReservations } from "@/lib/api";
+import { getImageUrl } from "@/lib/utils/image-url";
 
 interface Reservation {
   id: number;
@@ -143,9 +144,8 @@ export function ReservationList({
             <div className="flex gap-6">
               <img
                 src={
-                  reservation.farm?.main_image_url
-                    ? `${process.env.NEXT_PUBLIC_API_URL}${reservation.farm.main_image_url}`
-                    : "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
+                  getImageUrl(reservation.farm?.main_image_url) ||
+                  "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
                 }
                 alt={reservation.farm?.name}
                 className="w-32 h-24 rounded-lg object-cover"
