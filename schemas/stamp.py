@@ -3,6 +3,8 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+
+
 # Prefecture Stamp Schemas
 class PrefectureStampBase(BaseModel):
     prefecture_code: str
@@ -14,16 +16,22 @@ class PrefectureStampBase(BaseModel):
     is_active: bool = True
 
 
+
+
 class PrefectureStampResponse(PrefectureStampBase):
     created_at: datetime
+
 
     class Config:
         from_attributes = True
 
 
+
+
 # User Stamp Collection Schemas
 class StampCollectionSummary(BaseModel):
     """ユーザーのスタンプ収集サマリー"""
+
 
     total_prefectures: int  # 訪問都道府県数
     total_visits: int  # 総訪問回数
@@ -31,8 +39,11 @@ class StampCollectionSummary(BaseModel):
     completion_rate: float  # 達成率 (0-100)
 
 
+
+
 class PrefectureStampStatus(BaseModel):
     """都道府県別スタンプ状態"""
+
 
     prefecture_code: str
     name: str
@@ -45,19 +56,26 @@ class PrefectureStampStatus(BaseModel):
     unique_farms_count: int = 0
 
 
+
+
 class StampCollectionResponse(BaseModel):
     """スタンプコレクション全体のレスポンス"""
 
+
     summary: StampCollectionSummary
     stamps: list[PrefectureStampStatus]
+
 
     class Config:
         from_attributes = True
 
 
+
+
 # Prefecture Detail Schemas
 class VisitedFarmInfo(BaseModel):
     """訪問済みファーム情報"""
+
 
     farm_id: int
     farm_name: str
@@ -66,8 +84,11 @@ class VisitedFarmInfo(BaseModel):
     review_id: int
 
 
+
+
 class PrefectureDetailResponse(BaseModel):
     """特定都道府県の詳細情報"""
+
 
     prefecture_code: str
     name: str
@@ -77,5 +98,34 @@ class PrefectureDetailResponse(BaseModel):
     unique_farms_count: int
     visited_farms: list[VisitedFarmInfo]
 
+
     class Config:
         from_attributes = True
+
+
+
+
+# Ranking Schemas
+class RankingEntry(BaseModel):
+    """ランキングエントリ"""
+
+
+    rank: int
+    guest_id: int
+    guest_name: str
+    avatar_url: Optional[str]
+    total_prefectures: int
+    completion_rate: float
+
+
+
+
+class RankingResponse(BaseModel):
+    """ランキングレスポンス"""
+
+
+    rankings: list[RankingEntry]
+    my_ranking: Optional[RankingEntry]
+    total_users: int
+
+
