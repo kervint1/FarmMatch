@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlmodel import Session, select
+import os
+import uuid
+from pathlib import Path
 
 from database import get_session
 from models import Farm, FarmImage
@@ -141,3 +144,96 @@ async def delete_farm(
     success = FarmService.delete_farm(session, farm_id)
     if not success:
         raise HTTPException(status_code=404, detail="Farm not found")
+
+
+@router.post("/{farm_id}/images")
+async def upload_farm_image(
+    farm_id: int,
+    file: UploadFile = File(...),
+    is_main: bool = False,
+    session: Session = Depends(get_session),
+):
+    """
+    Upload an image for a farm
+
+    - **farm_id**: ID of the farm
+    - **file**: Image file (JPEG, PNG, GIF, WebP)
+    - **is_main**: Set as main image (default: False)
+    """
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.",
+        )
+
+    # Validate file size (max 10MB)
+    content = await file.read()
+    file_size = len(content)
+
+    if file_size > 10 * 1024 * 1024:  # 10MB
+        raise HTTPException(
+            status_code=400, detail="File too large. Maximum size is 10MB."
+        )
+
+    # Check if farm exists
+    farm = FarmService.get_farm(session, farm_id)
+    if not farm:
+        raise HTTPException(status_code=404, detail="Farm not found")
+
+    # Create uploads directory if it doesn't exist
+    uploads_dir = Path(__file__).parent.parent / "uploads" / "farm_images"
+    uploads_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate unique filename
+    file_extension = Path(file.filename).suffix.lower()
+    unique_filename = f"{uuid.uuid4()}{file_extension}"
+    file_path = uploads_dir / unique_filename
+
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+
+    # If this is set as main image, unset other main images
+    if is_main:
+        existing_main_images = session.exec(
+            select(FarmImage)
+            .where(FarmImage.farm_id == farm_id)
+            .where(FarmImage.is_main == True)
+        ).all()
+        for img in existing_main_images:
+            img.is_main = False
+            session.add(img)
+
+    # Get the highest display_order for this farm
+    max_order = session.exec(
+        select(FarmImage.display_order)
+        .where(FarmImage.farm_id == farm_id)
+        .order_by(FarmImage.display_order.desc())
+    ).first()
+
+    display_order = (max_order or -1) + 1
+
+    # Create FarmImage record
+    image_url = f"/uploads/farm_images/{unique_filename}"
+    farm_image = FarmImage(
+        farm_id=farm_id,
+        image_url=image_url,
+        is_main=is_main,
+        display_order=display_order,
+    )
+    session.add(farm_image)
+    session.commit()
+    session.refresh(farm_image)
+
+    return {
+        "id": farm_image.id,
+        "farm_id": farm_image.farm_id,
+        "image_url": farm_image.image_url,
+        "is_main": farm_image.is_main,
+        "display_order": farm_image.display_order,
+    }

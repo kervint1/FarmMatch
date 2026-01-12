@@ -63,3 +63,4 @@ class ApprovalRequest(BaseModel):
     """Schema for approving a reservation"""
 
     approval_message: Optional[str] = None
+    host_id: int  # ホストのIDを指定
