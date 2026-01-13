@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -7,7 +8,7 @@ import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { ReservationForm } from "@/components/features/reservation/ReservationForm";
 
-export default function ReservationPage() {
+function ReservationPageContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const farmId = searchParams.get("farmId");
@@ -69,5 +70,21 @@ export default function ReservationPage() {
         <ReservationForm farmId={farmId} />
       </Container>
     </div>
+  );
+}
+
+export default function ReservationPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-white">
+        <Container size="md" className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <p className="text-gray-600">読み込み中...</p>
+          </div>
+        </Container>
+      </div>
+    }>
+      <ReservationPageContent />
+    </Suspense>
   );
 }
