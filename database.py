@@ -2,9 +2,12 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from core.config import settings
 
+# Fix DATABASE_URL scheme for SQLAlchemy 2.0 compatibility
+database_url = settings.DATABASE_URL.replace("postgres://", "postgresql://")
+
 # Create engine with connection pooling
 engine = create_engine(
-    settings.DATABASE_URL,
+    database_url,
     echo=settings.DEBUG,
     pool_pre_ping=True,
     pool_size=5,

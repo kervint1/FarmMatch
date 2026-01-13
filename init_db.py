@@ -23,7 +23,9 @@ from models import (
 
 def create_db_and_tables():
     """Create all tables in the database."""
-    engine = create_engine(settings.DATABASE_URL, echo=True)
+    # Fix DATABASE_URL scheme for SQLAlchemy 2.0 compatibility
+    database_url = settings.DATABASE_URL.replace("postgres://", "postgresql://")
+    engine = create_engine(database_url, echo=True)
     SQLModel.metadata.create_all(engine)
     print("✅ All tables created successfully!")
     return engine
