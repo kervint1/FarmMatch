@@ -3,6 +3,7 @@ from sqlmodel import Session, select
 
 from database import get_session
 from models.farm import Farm
+from models.farm_image import FarmImage
 from models.user import User
 from models import Review
 from schemas.reservation import (
@@ -32,16 +33,37 @@ async def list_reservations(
         session, skip=skip, limit=limit, guest_id=guest_id, farm_id=farm_id, status=status
     )
 
-    # レビューの有無をチェック
+    # レビューの有無をチェックし、ファーム情報を追加
     result = []
     for reservation in reservations:
         review = session.exec(
             select(Review).where(Review.reservation_id == reservation.id)
         ).first()
 
+        # ファーム情報を取得
+        farm = session.exec(
+            select(Farm).where(Farm.id == reservation.farm_id)
+        ).first()
+
+        farm_info = None
+        if farm:
+            # メイン画像を取得
+            main_image = session.exec(
+                select(FarmImage)
+                .where(FarmImage.farm_id == farm.id)
+                .where(FarmImage.is_main == True)
+            ).first()
+
+            farm_info = {
+                "id": farm.id,
+                "name": farm.name,
+                "main_image_url": main_image.image_url if main_image else None
+            }
+
         reservation_dict = {
             **reservation.model_dump(),
-            "has_review": review is not None
+            "has_review": review is not None,
+            "farm": farm_info
         }
         result.append(ReservationListResponse(**reservation_dict))
 
@@ -57,7 +79,33 @@ async def get_reservation(
     reservation = ReservationService.get_reservation(session, reservation_id)
     if not reservation:
         raise HTTPException(status_code=404, detail="Reservation not found")
-    return reservation
+
+    # ファーム情報を取得
+    farm = session.exec(
+        select(Farm).where(Farm.id == reservation.farm_id)
+    ).first()
+
+    farm_info = None
+    if farm:
+        # メイン画像を取得
+        main_image = session.exec(
+            select(FarmImage)
+            .where(FarmImage.farm_id == farm.id)
+            .where(FarmImage.is_main == True)
+        ).first()
+
+        farm_info = {
+            "id": farm.id,
+            "name": farm.name,
+            "main_image_url": main_image.image_url if main_image else None
+        }
+
+    reservation_dict = {
+        **reservation.model_dump(),
+        "farm": farm_info
+    }
+
+    return ReservationResponse(**reservation_dict)
 
 
 @router.post("", response_model=ReservationResponse, status_code=201)
@@ -154,16 +202,37 @@ async def get_host_reservations(
 
     reservations = session.exec(query).all()
 
-    # レビューの有無をチェック
+    # レビューの有無をチェックし、ファーム情報を追加
     result = []
     for reservation in reservations:
         review = session.exec(
             select(Review).where(Review.reservation_id == reservation.id)
         ).first()
 
+        # ファーム情報を取得
+        farm = session.exec(
+            select(Farm).where(Farm.id == reservation.farm_id)
+        ).first()
+
+        farm_info = None
+        if farm:
+            # メイン画像を取得
+            main_image = session.exec(
+                select(FarmImage)
+                .where(FarmImage.farm_id == farm.id)
+                .where(FarmImage.is_main == True)
+            ).first()
+
+            farm_info = {
+                "id": farm.id,
+                "name": farm.name,
+                "main_image_url": main_image.image_url if main_image else None
+            }
+
         reservation_dict = {
             **reservation.model_dump(),
-            "has_review": review is not None
+            "has_review": review is not None,
+            "farm": farm_info
         }
         result.append(ReservationListResponse(**reservation_dict))
 
