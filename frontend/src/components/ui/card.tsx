@@ -76,7 +76,7 @@ export function CardFooter({ children, className = "" }: CardFooterProps) {
 }
 
 interface CardImageProps {
-  src: string;
+  src: string | null;
   alt: string;
   className?: string;
 }
@@ -84,7 +84,7 @@ interface CardImageProps {
 export function CardImage({ src, alt, className = "" }: CardImageProps) {
   return (
     <img
-      src={src}
+      src={src || ""}
       alt={alt}
       className={`w-full h-48 object-cover rounded-t-lg ${className}`}
     />

@@ -143,10 +143,7 @@ export function ReservationList({
           <CardBody>
             <div className="flex gap-6">
               <img
-                src={
-                  getImageUrl(reservation.farm?.main_image_url) ||
-                  "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
-                }
+                src={getImageUrl(reservation.farm?.main_image_url)}
                 alt={reservation.farm?.name}
                 className="w-32 h-24 rounded-lg object-cover"
               />

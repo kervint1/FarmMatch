@@ -29,6 +29,14 @@ class ReservationUpdate(BaseModel):
     message: Optional[str] = None
 
 
+class FarmInfo(BaseModel):
+    """Farm information for reservation response"""
+
+    id: int
+    name: str
+    main_image_url: Optional[str] = None
+
+
 class ReservationResponse(ReservationBase):
     """Schema for Reservation response"""
 
@@ -37,6 +45,7 @@ class ReservationResponse(ReservationBase):
     status: str
     created_at: datetime
     updated_at: datetime
+    farm: Optional[FarmInfo] = None  # ファーム情報
 
     class Config:
         from_attributes = True
@@ -54,6 +63,7 @@ class ReservationListResponse(BaseModel):
     total_amount: int
     created_at: datetime
     has_review: bool = False  # レビューが存在するかどうか
+    farm: Optional[FarmInfo] = None  # ファーム情報
 
     class Config:
         from_attributes = True
