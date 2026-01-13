@@ -1,119 +1,147 @@
-import Image from "next/image";
-import type { PrefectureStampStatus } from "@/types/stamp";
+"use client";
 
+import { useEffect, useState } from "react";
+import { getRanking } from "@/lib/api/stamps";
+import type { RankingResponse, RankingEntry } from "@/types/stamp";
 
-interface StampCardProps {
-  stamp: PrefectureStampStatus;
-  onClick?: () => void;
+interface RankingListProps {
+  userId: string | null;
 }
 
+export function RankingList({ userId }: RankingListProps) {
+  const [ranking, setRanking] = useState<RankingResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export function StampCard({ stamp, onClick }: StampCardProps) {
-  const handleClick = () => {
-    if (stamp.is_visited && onClick) {
-      onClick();
-    }
-  };
+  useEffect(() => {
+    const fetchRanking = async () => {
+      try {
+        setLoading(true);
+        const data = await getRanking(50, userId || undefined);
+        setRanking(data);
+      } catch (error) {
+        console.error("Error fetching ranking:", error);
+        setError("ランキングの取得に失敗しました");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRanking();
+  }, [userId]);
 
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-green-500 mb-4"></div>
+        <p className="text-gray-600">読み込み中...</p>
+      </div>
+    );
+  }
+
+  if (error || !ranking) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600">{error || "ランキングの取得に失敗しました"}</p>
+      </div>
+    );
+  }
 
   return (
-    <div
-      onClick={handleClick}
-      className={`
-        relative rounded-lg overflow-hidden border-2 transition-all duration-200
-        ${
-          stamp.is_visited
-            ? "border-green-400 cursor-pointer hover:shadow-xl hover:scale-105 hover:border-green-500"
-            : "border-gray-300"
-        }
-      `}
-    >
-      {/* Prefecture Image */}
-      <div className="relative aspect-square w-full">
-        <img
-          src={`${process.env.NEXT_PUBLIC_API_URL}${stamp.image_url}`}
-          alt={stamp.name}
-          className={`
-            w-full h-full object-cover
-            mix-blend-multiply
-            ${!stamp.is_visited ? "filter grayscale" : ""}
-          `}
-        />
-
-
-        {/* 未訪問オーバーレイ */}
-        {!stamp.is_visited && (
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <div className="bg-white bg-opacity-90 px-3 py-1 rounded-full">
-              <span className="text-gray-700 font-bold text-sm">未訪問</span>
-            </div>
-          </div>
-        )}
-
-
-        {/* 訪問回数バッジ */}
-        {stamp.is_visited && stamp.visit_count > 0 && (
-          <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
-            {stamp.visit_count}回
-          </div>
-        )}
-      </div>
-
-
-      {/* Prefecture Name */}
-      <div
-        className={`
-        p-2 text-center
-        ${stamp.is_visited ? "bg-green-50" : "bg-gray-100"}
-      `}
-      >
-        <p
-          className={`
-          font-bold text-sm
-          ${stamp.is_visited ? "text-green-900" : "text-gray-500"}
-        `}
-        >
-          {stamp.name}
-        </p>
-
-
-        {/* 訪問日 */}
-        {stamp.is_visited && stamp.last_visit_date && (
-          <p className="text-xs text-gray-600 mt-1">
-            {new Date(stamp.last_visit_date).toLocaleDateString("ja-JP", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </p>
-        )}
-      </div>
-
-
-      {/* ホバー時の詳細表示アイコン */}
-      {stamp.is_visited && (
-        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center pointer-events-none">
-          <div className="opacity-0 hover:opacity-100 transition-opacity duration-200">
-            <div className="bg-white rounded-full p-2 shadow-lg">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* 自分の順位（ハイライト表示） */}
+      {ranking.my_ranking && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-500 rounded-lg p-6 shadow-md">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="text-2xl">🎖️</span>
+            あなたの順位
+          </h3>
+          <RankingRow entry={ranking.my_ranking} highlight={true} />
         </div>
       )}
+
+      {/* ランキングリスト */}
+      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6">
+          <h2 className="text-2xl font-bold">全国ランキング</h2>
+          <p className="text-green-100 mt-1">参加者数: {ranking.total_users}人</p>
+        </div>
+
+        <div className="divide-y">
+          {ranking.rankings.map((entry) => (
+            <RankingRow
+              key={entry.guest_id}
+              entry={entry}
+              highlight={userId ? entry.guest_id === parseInt(userId) : false}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
+interface RankingRowProps {
+  entry: RankingEntry;
+  highlight?: boolean;
+}
 
+function RankingRow({ entry, highlight }: RankingRowProps) {
+  // トップ3のメダル
+  const getMedalIcon = (rank: number) => {
+    if (rank === 1) return "🥇";
+    if (rank === 2) return "🥈";
+    if (rank === 3) return "🥉";
+    return null;
+  };
+
+  const medal = getMedalIcon(entry.rank);
+
+  return (
+    <div
+      className={`p-4 flex items-center gap-4 ${
+        highlight ? "bg-green-50" : "hover:bg-gray-50"
+      } transition-colors`}
+    >
+      {/* 順位 */}
+      <div className="flex-shrink-0 w-16 text-center">
+        {medal ? (
+          <span className="text-3xl">{medal}</span>
+        ) : (
+          <span className="text-2xl font-bold text-gray-600">{entry.rank}</span>
+        )}
+      </div>
+
+      {/* ユーザー情報 */}
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-gray-900 truncate">{entry.guest_name}</p>
+      </div>
+
+      {/* 統計情報 */}
+      <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 sm:gap-6">
+        <div className="text-right">
+          <p className="text-sm text-gray-600">訪問都道府県</p>
+          <p className="text-xl font-bold text-green-600">
+            {entry.total_prefectures}
+            <span className="text-sm text-gray-500">/47</span>
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-gray-600">達成率</p>
+          <p className="text-xl font-bold text-green-600">
+            {entry.completion_rate}%
+          </p>
+        </div>
+      </div>
+
+      {/* プログレスバー */}
+      <div className="hidden md:block w-32">
+        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-green-400 to-green-600"
+            style={{ width: `${entry.completion_rate}%` }}
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+}
