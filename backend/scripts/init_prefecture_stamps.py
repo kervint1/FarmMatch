@@ -80,17 +80,21 @@ def init_prefecture_stamps():
     """都道府県スタンプマスタデータを初期化"""
     print("都道府県スタンプマスタデータ初期化を開始...")
 
-    engine = create_engine(settings.DATABASE_URL)
+    database_url = settings.DATABASE_URL
+    if database_url and database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+    engine = create_engine(database_url)
 
     with Session(engine) as session:
         # 既存データをチェック
         existing_count = len(list(session.exec(select(PrefectureStamp)).all()))
         if existing_count > 0:
             print(f"警告: 既に {existing_count} 件のデータが存在します")
-            response = input("既存データを削除して再作成しますか? (y/N): ")
-            if response.lower() != "y":
-                print("処理を中止しました")
-                return
+            # response = input("既存データを削除して再作成しますか? (y/N): ")
+            # if response.lower() != "y":
+            #     print("処理を中止しました")
+            #     return
 
             # 既存データを削除
             for stamp in session.exec(select(PrefectureStamp)).all():
