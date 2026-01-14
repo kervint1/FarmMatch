@@ -84,7 +84,7 @@ export default function PostDetailPage() {
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/posts/${postId}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}`);
       if (response.ok) {
         const data = await response.json();
         setPost(data);
@@ -100,7 +100,7 @@ export default function PostDetailPage() {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/posts/${postId}/comments`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/comments`);
       if (response.ok) {
         const data = await response.json();
         setComments(data);
@@ -112,7 +112,7 @@ export default function PostDetailPage() {
 
   const handleLike = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/posts/${postId}/like`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/like`, {
         method: "POST",
       });
 
@@ -129,7 +129,7 @@ export default function PostDetailPage() {
     if (!session || !userId || !newComment.trim()) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/posts/${postId}/comments`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -68,7 +68,8 @@ export default function CommunityPage() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/posts?limit=50");
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/posts?limit=50`);
       if (response.ok) {
         const data = await response.json();
         setPosts(data);
@@ -92,7 +93,8 @@ export default function CommunityPage() {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/api/posts", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +116,8 @@ export default function CommunityPage() {
 
   const handleLike = async (postId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/posts/${postId}/like`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/posts/${postId}/like`, {
         method: "POST",
       });
 
