@@ -212,6 +212,15 @@ class StampService:
         if not prefecture_code:
             return
 
+        # prefecture_stampsテーブルに存在するかチェック
+        prefecture_exists = session.exec(
+            select(PrefectureStamp).where(
+                PrefectureStamp.prefecture_code == prefecture_code
+            )
+        ).first()
+        if not prefecture_exists:
+            print(f"Warning: Prefecture code {prefecture_code} not found in prefecture_stamps table. Skipping stamp sync.")
+            return
 
         # UserStampDetail を作成（重複チェック: review_id が unique）
         existing_detail = session.exec(
