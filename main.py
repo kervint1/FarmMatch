@@ -6,6 +6,7 @@ from pathlib import Path
 from core.config import settings
 from routers import auth, farms, posts, reservations, stamps, users
 from init_endpoint import router as init_router
+from seed_endpoint import router as seed_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -29,6 +30,7 @@ app.include_router(reservations.router)
 app.include_router(posts.router)
 app.include_router(stamps.router)
 app.include_router(init_router)
+app.include_router(seed_router)
 
 # Static files for images
 uploads_dir = Path(__file__).parent / "uploads"
