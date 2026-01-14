@@ -2,7 +2,7 @@
 Initialization endpoint for Heroku deployment
 """
 from fastapi import APIRouter, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session, select, SQLModel
 
 from database import engine
 from models import PrefectureStamp
@@ -14,6 +14,9 @@ router = APIRouter()
 async def init_prefecture_stamps():
     """Initialize prefecture stamps data"""
     try:
+        # First ensure all tables exist
+        SQLModel.metadata.create_all(engine)
+
         with Session(engine) as session:
             # Check if data already exists
             existing = session.exec(select(PrefectureStamp)).first()
