@@ -15,6 +15,7 @@ from models import (
     FarmImage,
     Post,
     PostImage,
+    PrefectureStamp,
     Reservation,
     Review,
     User,
@@ -105,6 +106,18 @@ def seed_sample_data(engine):
         for user in users:
             session.refresh(user)
         print(f"✅ Created {len(users)} users")
+
+        # Create prefecture stamps
+        prefecture_stamps = [
+            PrefectureStamp(prefecture_code="01", name="北海道", name_romaji="Hokkaido", image_url="/stamps/hokkaido.png", region="北海道", display_order=1),
+            PrefectureStamp(prefecture_code="02", name="青森県", name_romaji="Aomori", image_url="/stamps/aomori.png", region="東北", display_order=2),
+            PrefectureStamp(prefecture_code="20", name="長野県", name_romaji="Nagano", image_url="/stamps/nagano.png", region="中部", display_order=20),
+            PrefectureStamp(prefecture_code="43", name="熊本県", name_romaji="Kumamoto", image_url="/stamps/kumamoto.png", region="九州", display_order=43),
+        ]
+        for stamp in prefecture_stamps:
+            session.add(stamp)
+        session.commit()
+        print(f"✅ Created {len(prefecture_stamps)} prefecture stamps")
 
         # Create farms
         farms = [
