@@ -80,10 +80,7 @@ def init_prefecture_stamps():
     """都道府県スタンプマスタデータを初期化"""
     print("都道府県スタンプマスタデータ初期化を開始...")
 
-    database_url = settings.DATABASE_URL
-    if database_url and database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-
+    database_url = settings.DATABASE_URL.replace("postgres://", "postgresql://")
     engine = create_engine(database_url)
 
     with Session(engine) as session:
