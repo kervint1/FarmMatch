@@ -12,19 +12,22 @@ const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, account, profile, user }) {
+    async jwt({ token, account, profile, user, trigger }) {
       if (account && profile) {
         token.accessToken = account.access_token;
         token.userId = profile.sub;
         token.email = profile.email;
+      }
 
-        // Fetch user type from backend
+      // Fetch user type from backend if not already set or if explicitly updating
+      if ((trigger === "signIn" || trigger === "update" || !token.userType) && token.email) {
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-          const response = await fetch(`${apiUrl}/api/users/email/${profile.email}`);
+          const response = await fetch(`${apiUrl}/api/users/email/${token.email}`);
           if (response.ok) {
             const userData = await response.json();
             token.userType = userData.user_type;
+            console.log("Fetched user type:", userData.user_type);
           }
         } catch (error) {
           console.error("Error fetching user type:", error);
