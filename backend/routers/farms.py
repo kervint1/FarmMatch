@@ -8,6 +8,7 @@ from database import get_session
 from models import Farm, FarmImage
 from schemas.farm import FarmCreate, FarmListResponse, FarmResponse, FarmUpdate
 from services.farm import FarmService
+from services.appwrite_storage import get_appwrite_storage
 
 router = APIRouter(prefix="/api/farms", tags=["farms"])
 
@@ -182,21 +183,12 @@ async def upload_farm_image(
     if not farm:
         raise HTTPException(status_code=404, detail="Farm not found")
 
-    # Create uploads directory if it doesn't exist
-    uploads_dir = Path(__file__).parent.parent / "uploads" / "farm_images"
-    uploads_dir.mkdir(parents=True, exist_ok=True)
-
-    # Generate unique filename
-    file_extension = Path(file.filename).suffix.lower()
-    unique_filename = f"{uuid.uuid4()}{file_extension}"
-    file_path = uploads_dir / unique_filename
-
-    # Save file
+    # Upload to Appwrite Storage
     try:
-        with open(file_path, "wb") as buffer:
-            buffer.write(content)
+        storage = get_appwrite_storage()
+        image_url = storage.upload_file(content, file.filename, file.content_type)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
 
     # If this is set as main image, unset other main images
     if is_main:
@@ -219,7 +211,6 @@ async def upload_farm_image(
     display_order = (max_order or -1) + 1
 
     # Create FarmImage record
-    image_url = f"/uploads/farm_images/{unique_filename}"
     farm_image = FarmImage(
         farm_id=farm_id,
         image_url=image_url,
