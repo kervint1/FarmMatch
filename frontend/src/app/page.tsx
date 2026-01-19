@@ -9,7 +9,7 @@ import { AuthButtons } from "@/components/features/auth/AuthButtons";
 import { CtaButton } from "@/components/features/auth/CtaButton";
 import { FarmCard } from "@/components/features/farm/FarmCard";
 import { getFarms } from "@/lib/api";
-import { getImageUrl } from "@/lib/utils/image-url";
+import { getImageUrl, FALLBACK_FARM_IMAGE } from "@/lib/utils/image-url";
 
 export default function HomePage() {
   const [featuredFarms, setFeaturedFarms] = useState<any[]>([]);
@@ -79,6 +79,9 @@ export default function HomePage() {
                 src={getImageUrl("/uploads/farm_images/farm1_sub1.jpeg")}
                 alt="農業体験"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = FALLBACK_FARM_IMAGE;
+                }}
               />
             </div>
           </div>

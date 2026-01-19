@@ -1,4 +1,5 @@
 import React from "react";
+import { FALLBACK_FARM_IMAGE } from "@/lib/utils/image-url";
 
 interface CardProps {
   children: React.ReactNode;
@@ -84,9 +85,12 @@ interface CardImageProps {
 export function CardImage({ src, alt, className = "" }: CardImageProps) {
   return (
     <img
-      src={src || ""}
+      src={src || FALLBACK_FARM_IMAGE}
       alt={alt}
       className={`w-full h-48 object-cover rounded-t-lg ${className}`}
+      onError={(e) => {
+        e.currentTarget.src = FALLBACK_FARM_IMAGE;
+      }}
     />
   );
 }

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cancelReservation, getReservations } from "@/lib/api";
-import { getImageUrl } from "@/lib/utils/image-url";
+import { getImageUrl, FALLBACK_FARM_IMAGE } from "@/lib/utils/image-url";
 
 interface Reservation {
   id: number;
@@ -146,6 +146,9 @@ export function ReservationList({
                 src={getImageUrl(reservation.farm?.main_image_url)}
                 alt={reservation.farm?.name}
                 className="w-32 h-24 rounded-lg object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = FALLBACK_FARM_IMAGE;
+                }}
               />
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-2">

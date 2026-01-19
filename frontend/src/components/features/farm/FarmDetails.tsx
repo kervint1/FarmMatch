@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
 import { getFarm } from "@/lib/api";
-import { getImageUrl } from "@/lib/utils/image-url";
+import { getImageUrl, FALLBACK_FARM_IMAGE } from "@/lib/utils/image-url";
 
 interface FarmDetailsProps {
   farmId: string;
@@ -59,12 +59,12 @@ export function FarmDetails({ farmId }: FarmDetailsProps) {
         {/* メイン画像 */}
         <div className="rounded-lg overflow-hidden shadow-lg mb-6">
           <img
-            src={
-              getImageUrl(farm.main_image_url) ||
-              "http://localhost:8000/uploads/farm_images/farm1_main.jpg"
-            }
+            src={getImageUrl(farm.main_image_url)}
             alt={farm.name}
             className="w-full h-96 object-cover"
+            onError={(e) => {
+              e.currentTarget.src = FALLBACK_FARM_IMAGE;
+            }}
           />
         </div>
 

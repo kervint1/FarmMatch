@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/form";
 import { Card, CardBody, CardTitle } from "@/components/ui/card";
 import { getFarm, createReservation } from "@/lib/api";
-import { getImageUrl } from "@/lib/utils/image-url";
+import { getImageUrl, FALLBACK_FARM_IMAGE } from "@/lib/utils/image-url";
 
 interface ReservationFormProps {
   farmId: string;
@@ -325,12 +325,12 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
 
             {/* ファーム画像 */}
             <img
-              src={
-                getImageUrl(farm.main_image_url) ||
-                "https://images.unsplash.com/photo-1500595046891-cceef1ee6147?w=600&h=400&fit=crop"
-              }
+              src={getImageUrl(farm.main_image_url)}
               alt={farm.name}
               className="w-full h-40 rounded-lg object-cover mb-4"
+              onError={(e) => {
+                e.currentTarget.src = FALLBACK_FARM_IMAGE;
+              }}
             />
 
             {/* ファーム情報 */}
