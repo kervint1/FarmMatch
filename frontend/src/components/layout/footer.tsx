@@ -16,9 +16,7 @@ export function Footer() {
               </div>
               <span className="text-xl font-bold text-white">Farm Match</span>
             </div>
-            <p className="text-sm text-gray-400">
-              農業体験をシェアするプラットフォーム
-            </p>
+            <p className="text-sm text-gray-400">農業体験をシェアするプラットフォーム</p>
           </div>
 
           {/* Quick Links */}
@@ -26,26 +24,17 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-4">クイックリンク</h3>
             <ul className="space-y-2">
               <li>
-                <Link
-                  href="/search"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/search" className="text-gray-400 hover:text-white transition">
                   ファームを探す
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/community"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/community" className="text-gray-400 hover:text-white transition">
                   コミュニティ
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/mypage"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/mypage" className="text-gray-400 hover:text-white transition">
                   マイページ
                 </Link>
               </li>
@@ -57,26 +46,17 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-4">サポート</h3>
             <ul className="space-y-2">
               <li>
-                <Link
-                  href="#"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/support" className="text-gray-400 hover:text-white transition">
                   ヘルプセンター
                 </Link>
               </li>
               <li>
-                <Link
-                  href="#"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/support" className="text-gray-400 hover:text-white transition">
                   お問い合わせ
                 </Link>
               </li>
               <li>
-                <Link
-                  href="#"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/support" className="text-gray-400 hover:text-white transition">
                   FAQ
                 </Link>
               </li>
@@ -88,26 +68,17 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-4">法的情報</h3>
             <ul className="space-y-2">
               <li>
-                <Link
-                  href="#"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/privacy" className="text-gray-400 hover:text-white transition">
                   プライバシーポリシー
                 </Link>
               </li>
               <li>
-                <Link
-                  href="#"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="/terms" className="text-gray-400 hover:text-white transition">
                   利用規約
                 </Link>
               </li>
               <li>
-                <Link
-                  href="#"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                <Link href="#" className="text-gray-400 hover:text-white transition">
                   Cookie設定
                 </Link>
               </li>
@@ -125,7 +96,7 @@ export function Footer() {
           </p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <a
-              href="#"
+              href="https://twitter.com/"
               className="text-gray-400 hover:text-white transition"
               aria-label="Twitter"
             >
@@ -134,7 +105,7 @@ export function Footer() {
               </svg>
             </a>
             <a
-              href="#"
+              href="https://www.facebook.com/"
               className="text-gray-400 hover:text-white transition"
               aria-label="Facebook"
             >
@@ -143,7 +114,7 @@ export function Footer() {
               </svg>
             </a>
             <a
-              href="#"
+              href="https://www.instagram.com/"
               className="text-gray-400 hover:text-white transition"
               aria-label="Instagram"
             >

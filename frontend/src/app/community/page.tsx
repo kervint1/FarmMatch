@@ -181,7 +181,7 @@ export default function CommunityPage() {
                       type="text"
                       value={newPost.title}
                       onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="投稿のタイトルを入力"
                       required
                       maxLength={100}
@@ -193,7 +193,7 @@ export default function CommunityPage() {
                     <textarea
                       value={newPost.content}
                       onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="体験の感想や気づきを共有してください"
                       rows={6}
                       required
@@ -296,7 +296,15 @@ export default function CommunityPage() {
                       <span className="text-xl">💬</span>
                       <span className="text-sm font-medium">コメント</span>
                     </Link>
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors ml-auto">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${window.location.origin}/community/${post.id}`
+                        );
+                        alert("リンクをコピーしました！");
+                      }}
+                      className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors ml-auto"
+                    >
                       <span className="text-xl">🔗</span>
                       <span className="text-sm font-medium">共有</span>
                     </button>

@@ -52,9 +52,7 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
     fetchFarm();
   }, [farmId]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -143,22 +141,19 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
             dbUserId = user.id;
           } else {
             // Try to create user if it doesn't exist
-            const createResponse = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  google_id: (session.user as any)?.id || "unknown",
-                  email: session.user.email,
-                  name: session.user.name || "User",
-                  avatar_url: session.user.image || null,
-                  user_type: "guest",
-                }),
-              }
-            );
+            const createResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                google_id: (session.user as any)?.id || "unknown",
+                email: session.user.email,
+                name: session.user.name || "User",
+                avatar_url: session.user.image || null,
+                user_type: "guest",
+              }),
+            });
 
             if (createResponse.ok) {
               const newUser = await createResponse.json();
@@ -280,9 +275,7 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
 
               {/* 電話番号 */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  電話番号
-                </label>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">電話番号</label>
                 <Input
                   type="tel"
                   name="contactPhone"
@@ -304,6 +297,7 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
                   value={formData.message}
                   onChange={handleInputChange}
                   rows={4}
+                  className="text-black"
                 />
               </div>
 
@@ -312,18 +306,10 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
                 <p className="text-sm text-blue-900">
                   ✓ 予約確定後、ホストから確認の連絡が入ります
                 </p>
-                <p className="text-sm text-blue-900">
-                  ✓ キャンセルは7日前までは無料です
-                </p>
+                <p className="text-sm text-blue-900">✓ キャンセルは7日前までは無料です</p>
               </div>
 
-              <Button
-                variant="primary"
-                size="lg"
-                fullWidth
-                disabled={submitting}
-                type="submit"
-              >
+              <Button variant="primary" size="lg" fullWidth disabled={submitting} type="submit">
                 {submitting ? "予約中..." : "予約を確定する"}
               </Button>
             </form>
@@ -350,9 +336,7 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
             {/* ファーム情報 */}
             <div className="space-y-3">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {farm.name}
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">{farm.name}</h3>
                 <p className="text-sm text-gray-600">
                   {farm.prefecture} {farm.city}
                 </p>
@@ -361,9 +345,7 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
               <div className="border-t border-gray-200 pt-3">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">チェックイン</span>
-                  <span className="font-semibold">
-                    {formData.startDate || "-"}
-                  </span>
+                  <span className="font-semibold">{formData.startDate || "-"}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">チェックアウト</span>
@@ -379,17 +361,13 @@ export function ReservationForm({ farmId }: ReservationFormProps) {
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">1人1泊の価格</span>
-                  <span className="font-semibold">
-                    ¥{farm.price_per_day?.toLocaleString()}
-                  </span>
+                  <span className="font-semibold">¥{farm.price_per_day?.toLocaleString()}</span>
                 </div>
               </div>
 
               <div className="border-t border-gray-200 pt-3 bg-green-50 rounded p-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-900">
-                    合計金額
-                  </span>
+                  <span className="text-sm font-medium text-gray-900">合計金額</span>
                   <span className="text-2xl font-bold text-green-600">
                     ¥{totalPrice > 0 ? totalPrice.toLocaleString() : "0"}
                   </span>

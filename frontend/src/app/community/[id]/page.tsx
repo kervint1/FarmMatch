@@ -84,7 +84,9 @@ export default function PostDetailPage() {
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}`
+      );
       if (response.ok) {
         const data = await response.json();
         setPost(data);
@@ -100,7 +102,9 @@ export default function PostDetailPage() {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/comments`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/comments`
+      );
       if (response.ok) {
         const data = await response.json();
         setComments(data);
@@ -112,9 +116,12 @@ export default function PostDetailPage() {
 
   const handleLike = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/like`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/like`,
+        {
+          method: "POST",
+        }
+      );
 
       if (response.ok) {
         fetchPost();
@@ -129,17 +136,20 @@ export default function PostDetailPage() {
     if (!session || !userId || !newComment.trim()) return;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/comments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: newComment,
-          user_id: parseInt(userId),
-          post_id: parseInt(postId),
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/posts/${postId}/comments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: newComment,
+            user_id: parseInt(userId),
+            post_id: parseInt(postId),
+          }),
+        }
+      );
 
       if (response.ok) {
         setNewComment("");
@@ -255,7 +265,7 @@ export default function PostDetailPage() {
           <Card className="mb-6">
             <CardBody>
               <form onSubmit={handleSubmitComment}>
-                <div className="mb-4">
+                <div className="mb-4 text-black">
                   <textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
@@ -310,7 +320,9 @@ export default function PostDetailPage() {
                           setSelectedUser({
                             id: comment.user_id,
                             name: comment.user_name || `ユーザー${comment.user_id}`,
-                            type: (comment.user_type === "host" ? "host" : "guest") as "host" | "guest",
+                            type: (comment.user_type === "host" ? "host" : "guest") as
+                              | "host"
+                              | "guest",
                           })
                         }
                         className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 hover:bg-gray-200 transition-colors cursor-pointer"
